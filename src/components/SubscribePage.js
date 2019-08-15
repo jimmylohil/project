@@ -56,11 +56,11 @@ const useStyles = theme => ({
 });
 
 
-class TrendingPage extends Component {
+class SubscribePage extends Component {
     constructor(props){
         super(props);
         this.state = {
-            trending : [],
+            recommend : [],
             showPlayer : false,
             willPlay : [],
         }
@@ -76,22 +76,38 @@ class TrendingPage extends Component {
         
         return ('0' + m).slice(-2) + ":" + ('0'+s).slice(-2);
       }
+
+      handlePlayButton = (e) => {
+        const value = e.target.id;
+        console.log (value);
+
+        sessionStorage.setItem("uuid", value)
+        // const willPlay = this.state.willPlay
+        // willPlay.push(e.target.id)
+        // this.setState({
+        //     willPlay : e.target.id 
+        // });
+        // console.log(willPlay)
+
+    
+    }
       
 
     componentDidMount(){
         var jwt = sessionStorage.getItem("JWT")
-        axios.get(`http://localhost:80/api/trending?token=${jwt}`)
+        var username = sessionStorage.getItem("username")
+        axios.get(`http://localhost:80/api/getSuggestion?token=${jwt}&username=${username}`)
         .then(
             (response) => {
                 console.log("Get Latest Eps succesful")
                 console.log(response)
                 this.setState(
                     {
-                        trending : response.data.episodes,
+                        recommend : response.data.podcasts,
                         
                     }
                 )
-                console.log(this.state.trending)
+                console.log(this.state.recommend)
             } 
         )
 
@@ -105,7 +121,12 @@ class TrendingPage extends Component {
         console.log (value);
 
         sessionStorage.setItem("uuid", value)
-        
+        // const willPlay = this.state.willPlay
+        // willPlay.push(e.target.id)
+        // this.setState({
+        //     willPlay : e.target.id 
+        // });
+        // console.log(willPlay)
 
     
     }
@@ -116,7 +137,7 @@ class TrendingPage extends Component {
 
     render(){
         const {classes} = this.props;
-        const {trending} = this.state;
+        const {recommend} = this.state;
         
         return (
             
@@ -125,12 +146,12 @@ class TrendingPage extends Component {
                 <Grid container alignItems="center" justify="center">
                     <Grid item className={classes.titlegrid} >
                     <Typography variant="h2" className={classes.title}>
-                        Trending
+                        Recommended For You
                     </Typography>
                     </Grid>
                 </Grid>
             
-                {trending.map((item,i) =>
+                {recommend.map((item,i) =>
                 {
                     return(
                         <Paper className={classes.paper}>
@@ -138,13 +159,13 @@ class TrendingPage extends Component {
                             <Grid container xs={12}spacing={2}>
                                 <Grid item xs={3}>
                                 <Link to={{
-                                    pathname : `/episodepage/${item.uuid}`,
+                                    pathname : `/showpage/${item.uuid}`,
                                     state : {
-                                        eps_id : `${item.uuid}`
+                                        pod_id : `${item.uuid}`
                                     }
                                 }} className={classes.link}>
                                     <ButtonBase className={classes.image}>
-                                        <img className={classes.img} alt="complex" src={item.podcast.image} />
+                                        <img className={classes.img} alt="complex" src={item.image} />
                                     </ButtonBase>
                                     </Link>
                                 </Grid>
@@ -152,9 +173,9 @@ class TrendingPage extends Component {
                                 <Grid item xs={7} sm container>
                                     <Grid item xs container direction="column" spacing={2}>
                                     <Link to={{
-                                    pathname : `/episodepage/${item.uuid}`,
+                                    pathname : `/showpage/${item.uuid}`,
                                     state : {
-                                        eps_id : `${item.uuid}`
+                                        pod_id : `${item.uuid}`
                                     }
                                 }} className={classes.link}>
                                         <Grid item xs>
@@ -164,9 +185,12 @@ class TrendingPage extends Component {
                                             </Typography>
                                             
                                             <Typography variant="subtitle1" gutterBottom>
-                                                {item.podcast.author}
+                                                {item.author}
                                             </Typography>
                                          
+                                            {/* <Typography variant="body2" color="textSecondary">
+                                                ID: 1030114
+                                            </Typography> */}
 
                                         </Grid>
                                         </Link>
@@ -181,7 +205,7 @@ class TrendingPage extends Component {
                                     alignItems="center">
 
                                 <IconButton aria-label="Previous" >
-                                    <PlayCircleOutline className={classes.play} onClick={this.handlePlayButton} id={item.uuid} />                    
+                                    <PlayCircleOutline className={classes.play} onClick={this.handlePlayButton} id={item.uuid}/>                    
                                 </IconButton>
                                     
                                 </Grid>
@@ -207,8 +231,8 @@ class TrendingPage extends Component {
   
 }
 
-TrendingPage.propTypes = {
+RecommendedForYou.propTypes = {
     classes : PropTypes.object.isRequired,
 }
 
-export default withRouter(withStyles(useStyles)(TrendingPage));
+export default withRouter(withStyles(useStyles)(RecommendedForYou));

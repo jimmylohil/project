@@ -116,20 +116,19 @@ class RecommendedForYou extends Component {
         })
     };
 
-    handlePlayButton = e =>{
-        e.preventDefault();
-        const willPlay = this.state.willPlay
-        willPlay.push(e.target.item)
-        this.setState({
-            willPlay : willPlay 
-        });
-        console.log(this.state.willPlay)
+    handlePlayButton = (e) => {
+        const value = e.target.id;
+        console.log (value);
 
-        // this.props.history.push({
-        //     state:{
-        //     uuid : this.state.uuid,
-        //   }})
-        //   console.log(this.state.uuid);
+        sessionStorage.setItem("uuid", value)
+        // const willPlay = this.state.willPlay
+        // willPlay.push(e.target.id)
+        // this.setState({
+        //     willPlay : e.target.id 
+        // });
+        // console.log(willPlay)
+
+    
     }
 
    
@@ -198,18 +197,7 @@ class RecommendedForYou extends Component {
                                     </Grid>
                                 </Grid>
                                 
-                                <Grid container 
-                                    xs={2}
-                                    spacing={1}
-                                    direction="row"
-                                    justify="center"
-                                    alignItems="center">
-
-                                <IconButton aria-label="Previous" >
-                                    <PlayCircleOutline className={classes.play} onClick={this.handlePlayButton} id={item.uuid}/>                    
-                                </IconButton>
-                                    
-                                </Grid>
+                               
                                 </Grid>
                                            
                                 

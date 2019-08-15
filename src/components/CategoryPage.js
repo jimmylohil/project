@@ -197,9 +197,7 @@ class CategoryPage extends Component {
                                     justify="center"
                                     alignItems="center">
 
-                                <IconButton aria-label="Previous" onClick={this.handlePlayButton}>
-                                    <PlayCircleOutline className={classes.play}/>                    
-                                </IconButton>
+                                
                                     
                                 </Grid>
                                 </Grid>

@@ -203,6 +203,7 @@ class Player extends Component{
   componentDidMount(){
     var jwt = sessionStorage.getItem("JWT");
     var uuid = sessionStorage.getItem("uuid");
+    var username = sessionStorage.getItem("username")
     axios.get(`http://localhost:80/api/episodes/?token=${jwt}&uuid=${uuid}`)
     .then(
         (response) => {
@@ -223,6 +224,9 @@ class Player extends Component{
         }
     )
 
+    
+    
+
     .catch(function(error){
         console.log(error);
     })
@@ -238,6 +242,23 @@ class Player extends Component{
       {isPlaying : !isPlaying},
     )
 
+    if(isPlaying === true){
+      var jwt = sessionStorage.getItem("JWT");
+      var uuid = sessionStorage.getItem("uuid");
+      var username = sessionStorage.getItem("username");
+      axios.post(`http://localhost:80/api/listen?token=${jwt}&uuid=${uuid}&username=${username}`)
+    .then(
+        (response) => {
+           
+            console.log(response)
+            
+            
+        }
+    )
+    .catch(function(error){
+      console.log(error);
+  })
+    }
     console.log(isPlaying)
     
   }

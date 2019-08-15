@@ -450,7 +450,7 @@ function EpisodePageComp(props) {
                             alignItems="center">
 
                         <IconButton aria-label="Previous" >
-                            <PlayCircleOutline className={classes.play} onClick={this.handlePlayButton} id={item.uuid}/>                    
+                            <PlayCircleOutline className={classes.play}  id={item.uuid}/>                    
                         </IconButton>
                             
                         </Grid>

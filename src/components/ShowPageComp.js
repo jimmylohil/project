@@ -83,16 +83,17 @@ const useStyles = makeStyles(theme => ({
 
 function ShowPageComp(props) {
     const [pod_id, setPodId] = useState([props.location.state.pod_id])
-    
+    const [subs, setSubs] = useState([]);
     const [show, setShow] = useState([]);
     const [episodelist, setEpisodelist] = useState([]);
     const [relatedPodcast, setRelatedPodcast] = useState([]);
+    
 
     var jwt= sessionStorage.getItem("JWT");
     var podid = pod_id;
+    var username = sessionStorage.getItem("username")
     console.log(podid);
 
-    
 
     useEffect(()=> {
         axios.get(`http://localhost:80/api/podcasts/?token=${jwt}&uuid=${podid}`)
@@ -116,9 +117,36 @@ function ShowPageComp(props) {
         )
          }, []);
 
+         useEffect(()=>{
+            axios.get(`http://localhost:80/api/user/?token=${jwt}&username=${username}`)
+            .then(
+                (res =>
+                    setSubs(res.data.subscribed_podcasts),
+                    console.log(subs))
+            )
+             }, []);
+
        console.log(show);
        console.log(episodelist);
        console.log(relatedPodcast);
+       
+
+       function handleSubs(){
+           axios.post(`http://localhost:80/api/subscribe/?token=${jwt}&uuid=${podid}&username=${username}`)
+            .then(
+                (res =>
+                   console.log(res))
+            );
+        };
+
+        function handlePlayButton(e){
+            const value = e.target.id;
+            console.log (value);
+    
+            sessionStorage.setItem("uuid", value)
+            
+        
+        }
 
 
     const classes = useStyles();
@@ -196,8 +224,8 @@ function ShowPageComp(props) {
                                     direction="row"
                                     justify="flex-start"
                                     alignItems="flex-start">
-                                    <Button variant="contained" color="primary" className={classes.button}>
-                                        Subscribe
+                                    <Button variant="contained" color="primary" className={classes.button} onClick={handleSubs}>
+                                        Subsribe
                                     </Button>
                                 </Grid>
                             </Grid>
@@ -289,7 +317,7 @@ function ShowPageComp(props) {
                                     alignItems="center">
 
                                 <IconButton aria-label="Previous" >
-                                    <PlayCircleOutline className={classes.play}/>                    
+                                    <PlayCircleOutline className={classes.play} onClick={handlePlayButton}/>                    
                                 </IconButton>
                                     
                                 </Grid>
@@ -348,18 +376,7 @@ function ShowPageComp(props) {
                             </Grid>
                         </Grid>
                         
-                        <Grid container 
-                            xs={2}
-                            spacing={1}
-                            direction="row"
-                            justify="center"
-                            alignItems="center">
-
-                        <IconButton aria-label="Previous" >
-                            <PlayCircleOutline className={classes.play}/>                    
-                        </IconButton>
-                            
-                        </Grid>
+                       
                         </Grid>
                     </Paper>
         )}

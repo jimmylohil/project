@@ -309,6 +309,7 @@ class HomePageComp extends Component {
 
                 <Grid container spacing={3}>
                 {recently.slice(0,6).map((item,i)=>
+                
                 <Grid item xs={2}>
                     <Card className={classes.card}>
                     <Link to={{
@@ -335,10 +336,8 @@ class HomePageComp extends Component {
                     </Link>
                     </Card>
                 </Grid>
-
                 
-                    
-                    )}
+                )}
                 </Grid>
 
                 <Grid 
@@ -408,18 +407,6 @@ class HomePageComp extends Component {
                         </Grid>
                     </Grid>
                     
-                    <Grid container 
-                        xs={2}
-                        spacing={1}
-                        direction="row"
-                        justify="center"
-                        alignItems="center">
-
-                    <IconButton aria-label="Previous" >
-                        <PlayCircleOutline className={classes.play} onClick={this.handlePlayButton} id={item.uuid}/>                    
-                    </IconButton>
-                        
-                    </Grid>
                     </Grid>
                 </Paper>
 

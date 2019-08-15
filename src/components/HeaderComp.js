@@ -10,6 +10,7 @@ import Menu from '@material-ui/core/Menu';
 import SearchIcon from '@material-ui/icons/Search';
 import Category from '@material-ui/icons/Category';
 import NotificationsIcon from '@material-ui/icons/Notifications';
+import Subs from '@material-ui/icons/Subscriptions';
 import { Button, Container, Grid } from '@material-ui/core';
 import ToolTip from '@material-ui/core/ToolTip';
 import { withStyles } from '@material-ui/core/styles';
@@ -21,6 +22,7 @@ import {Link} from 'react-router-dom';
 import Typography from '@material-ui/core/Typography';
 import podlogo from '../images/podlogo_text_dark.png';
 import axios from 'axios';
+import useReactRouter from 'use-react-router';
 
 const useStyles = makeStyles(theme => ({
   grow: {
@@ -92,11 +94,15 @@ const useStyles = makeStyles(theme => ({
   link :{
     textDecoration : 'none',
     color : '#3c0b65',
+  },
+  linkSubs : {
+    color : 'white',
+    textDecoration : 'none',
   }
 }));
 
 export default function PrimarySearchAppBar(props) {
-
+  const {history, location, match} = useReactRouter();
 
     const [category, setCategory] = useState([]);
     useEffect(()=> {
@@ -111,6 +117,7 @@ export default function PrimarySearchAppBar(props) {
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [anchorCategoryEl, setAnchorCategoryEl] = React.useState(null);
+  const [search, setSearch] = React.useState("");
 
   function handleClick(event) {
     setAnchorEl(event.currentTarget);
@@ -128,7 +135,35 @@ export default function PrimarySearchAppBar(props) {
     setAnchorCategoryEl(null);
   }  
 
+  function signout(){
+    sessionStorage.removeItem("JWT");
+    sessionStorage.removeItem("username");
+    sessionStorage.removeItem("uuid");
+    history.push({
+      pathname : "/login"
+    })
+  }
   
+
+  function onChange(e){
+    e.preventDefault();
+    const value = e.target.value;
+    setSearch(value);
+    
+  }
+
+  
+
+
+  function onEnter(e){
+    if(e.key === 'Enter'){
+      console.log(search);
+      history.push({
+        pathname : "/searchresult"
+    })
+    sessionStorage.setItem("search",search)
+  }
+}
 
   const StyledMenu = withStyles({
     paper: {
@@ -228,11 +263,13 @@ export default function PrimarySearchAppBar(props) {
                     <SearchIcon/>
                   </div>
                   <InputBase
-                    placeholder="Search…"
+                    placeholder="Search"
                     classes={{
                       root: classes.inputRoot,
                       input: classes.inputInput,
                     }}
+                    onChange = {onChange}
+                    onKeyDown = {onEnter}
                     inputProps={{ 'aria-label': 'Search' }}
                   />
                 </div>
@@ -246,12 +283,13 @@ export default function PrimarySearchAppBar(props) {
                     alignItems="center"
                     >
                   <div className={classes.sectionDesktop}>
-                  <ToolTip title="Notification">
-                    <IconButton aria-label="Show 17 new notifications" color="inherit">
-                      <Badge badgeContent={17} color="secondary">
-                        <NotificationsIcon />
-                      </Badge>
+                    
+                  <ToolTip title="Subscription">
+                  <Link to = '/subscription' className={classes.linkSubs}>
+                    <IconButton color="inherit">
+                      <Subs />
                     </IconButton>
+                    </Link>
                   </ToolTip>
                   <Link to = '/trending' className={classes.linkTrend}>
                   <Button
@@ -284,13 +322,18 @@ export default function PrimarySearchAppBar(props) {
                     >
                       <Box width={200}>
                         <StyledMenuItem>
+                        <Link to={{
+                                    pathname : `/profile`,
+                                    
+                                }} className={classes.link}>
                           <ListItemText primary="Profile" />
+                          </Link>
                         </StyledMenuItem>
                         <StyledMenuItem>
-                          <ListItemText primary="Setting" />
+                          <ListItemText primary="Playlist" />
                         </StyledMenuItem>
                         <StyledMenuItem>
-                          <ListItemText primary="Log Out" />
+                          <ListItemText primary="Log Out" onClick={signout}/>
                         </StyledMenuItem>
                       </Box>
                     </StyledMenu>

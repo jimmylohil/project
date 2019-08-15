@@ -17,10 +17,10 @@ import CategoryPage from './components/CategoryPage';
 import axios from 'axios';
 import ShowPageComp from './components/ShowPageComp';
 import EpisodePageComp from './components/EpisodePageComp';
-
-
-
-
+import SearchResult from './components/SearchResult';
+import UserPageComp from './components/UserPageComp';
+import Popular from './components/Popular';
+import Subscription from './components/Subscription';
 
 class App extends Component{
 
@@ -83,6 +83,10 @@ class App extends Component{
           <Route path="/showpage" component={ShowPageComp} />
           <Route path="/episodepage" component={EpisodePageComp} />
           <Route path="/newrelease" component = {NewReleasePage} />
+          <Route path="/searchresult" component ={SearchResult} />
+          <Route path="/profile" component={UserPageComp} />
+          <Route path="/popular" component={Popular} />
+          <Route path="/subscription" component={Subscription} />
         </Switch>
         <Player />
         

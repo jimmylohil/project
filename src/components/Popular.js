@@ -56,11 +56,11 @@ const useStyles = theme => ({
 });
 
 
-class RecentlyPlayed extends Component {
+class Popular extends Component {
     constructor(props){
         super(props);
         this.state = {
-            recently : [],
+            popular : [],
             showPlayer : false,
             willPlay : [],
         }
@@ -80,19 +80,18 @@ class RecentlyPlayed extends Component {
 
     componentDidMount(){
         var jwt = sessionStorage.getItem("JWT")
-        var username = sessionStorage.getItem("username")
-        axios.get(`http://localhost:80/api/recent_play/?token=${jwt}&username=${username}`)
+        axios.get(`http://localhost:80/api/popular/?token=${jwt}`)
         .then(
             (response) => {
                 console.log("Get Latest Eps succesful")
                 console.log(response)
                 this.setState(
                     {
-                        recently : response.data.episodes,
+                        popular : response.data.podcasts,
                         
                     }
                 )
-                console.log(this.state.recently)
+                console.log(this.state.popular)
             } 
         )
 
@@ -106,13 +105,7 @@ class RecentlyPlayed extends Component {
         console.log (value);
 
         sessionStorage.setItem("uuid", value)
-        // const willPlay = this.state.willPlay
-        // willPlay.push(e.target.id)
-        // this.setState({
-        //     willPlay : e.target.id 
-        // });
-        // console.log(willPlay)
-
+    
     
     }
 
@@ -122,7 +115,7 @@ class RecentlyPlayed extends Component {
 
     render(){
         const {classes} = this.props;
-        const {recently} = this.state;
+        const {popular} = this.state;
         
         return (
             
@@ -131,12 +124,12 @@ class RecentlyPlayed extends Component {
                 <Grid container alignItems="center" justify="center">
                     <Grid item className={classes.titlegrid} >
                     <Typography variant="h2" className={classes.title}>
-                        Recently Played
+                        Popular
                     </Typography>
                     </Grid>
                 </Grid>
             
-                {recently.map((item,i) =>
+                {popular.map((item,i) =>
                     
                     <Paper className={classes.paper}>
                                     
@@ -149,7 +142,7 @@ class RecentlyPlayed extends Component {
                             }
                         }} className={classes.link}>
                             <ButtonBase className={classes.image}>
-                                <img className={classes.img} alt="complex" src={item.podcast.image} />
+                                <img className={classes.img} alt="complex" src={item.image} />
                             </ButtonBase>
                             </Link>
                         </Grid>
@@ -169,12 +162,9 @@ class RecentlyPlayed extends Component {
                                     </Typography>
                                     
                                     <Typography variant="subtitle1" gutterBottom>
-                                        {item.podcast.author}
+                                        {item.author}
                                     </Typography>
                                  
-                                    {/* <Typography variant="body2" color="textSecondary">
-                                        ID: 1030114
-                                    </Typography> */}
 
                                 </Grid>
                                 </Link>
@@ -216,8 +206,8 @@ class RecentlyPlayed extends Component {
   
 }
 
-RecentlyPlayed.propTypes = {
+Popular.propTypes = {
     classes : PropTypes.object.isRequired,
 }
 
-export default withRouter(withStyles(useStyles)(RecentlyPlayed));
+export default withRouter(withStyles(useStyles)(Popular));

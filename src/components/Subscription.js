@@ -56,11 +56,11 @@ const useStyles = theme => ({
 });
 
 
-class RecentlyPlayed extends Component {
+class Subscription extends Component {
     constructor(props){
         super(props);
         this.state = {
-            recently : [],
+            subscription : [],
             showPlayer : false,
             willPlay : [],
         }
@@ -81,18 +81,18 @@ class RecentlyPlayed extends Component {
     componentDidMount(){
         var jwt = sessionStorage.getItem("JWT")
         var username = sessionStorage.getItem("username")
-        axios.get(`http://localhost:80/api/recent_play/?token=${jwt}&username=${username}`)
+        axios.get(`http://localhost:80/api/getSubscribedPodcast/?token=${jwt}&username=${username}`)
         .then(
             (response) => {
                 console.log("Get Latest Eps succesful")
                 console.log(response)
                 this.setState(
                     {
-                        recently : response.data.episodes,
+                        subscription : response.data.podcasts,
                         
                     }
                 )
-                console.log(this.state.recently)
+                console.log(this.state.subscription)
             } 
         )
 
@@ -122,7 +122,7 @@ class RecentlyPlayed extends Component {
 
     render(){
         const {classes} = this.props;
-        const {recently} = this.state;
+        const {subscription} = this.state;
         
         return (
             
@@ -131,25 +131,25 @@ class RecentlyPlayed extends Component {
                 <Grid container alignItems="center" justify="center">
                     <Grid item className={classes.titlegrid} >
                     <Typography variant="h2" className={classes.title}>
-                        Recently Played
+                        Subscription
                     </Typography>
                     </Grid>
                 </Grid>
             
-                {recently.map((item,i) =>
+                {subscription.map((item,i) =>
                     
                     <Paper className={classes.paper}>
                                     
                     <Grid container xs={12}spacing={2}>
                         <Grid item xs={3}>
                         <Link to={{
-                            pathname : `/episodepage/${item.uuid}`,
+                            pathname : `/showpage/${item.uuid}`,
                             state : {
-                                eps_id : `${item.uuid}`
+                                pod_id : `${item.uuid}`
                             }
                         }} className={classes.link}>
                             <ButtonBase className={classes.image}>
-                                <img className={classes.img} alt="complex" src={item.podcast.image} />
+                                <img className={classes.img} alt="complex" src={item.image} />
                             </ButtonBase>
                             </Link>
                         </Grid>
@@ -157,9 +157,9 @@ class RecentlyPlayed extends Component {
                         <Grid item xs={7} sm container>
                             <Grid item xs container direction="column" spacing={2}>
                             <Link to={{
-                            pathname : `/episodepage/${item.uuid}`,
+                            pathname : `/showpage/${item.uuid}`,
                             state : {
-                                eps_id : `${item.uuid}`
+                                pod_id : `${item.uuid}`
                             }
                         }} className={classes.link}>
                                 <Grid item xs>
@@ -169,30 +169,15 @@ class RecentlyPlayed extends Component {
                                     </Typography>
                                     
                                     <Typography variant="subtitle1" gutterBottom>
-                                        {item.podcast.author}
+                                        {item.author}
                                     </Typography>
                                  
-                                    {/* <Typography variant="body2" color="textSecondary">
-                                        ID: 1030114
-                                    </Typography> */}
-
+                                    
                                 </Grid>
                                 </Link>
                             </Grid>
                         </Grid>
                         
-                        <Grid container 
-                            xs={2}
-                            spacing={1}
-                            direction="row"
-                            justify="center"
-                            alignItems="center">
-
-                        <IconButton aria-label="Previous" onClick={this.handlePlayButton}>
-                            <PlayCircleOutline className={classes.play}/>                    
-                        </IconButton>
-                            
-                        </Grid>
                         </Grid>
                                    
                         
@@ -216,8 +201,8 @@ class RecentlyPlayed extends Component {
   
 }
 
-RecentlyPlayed.propTypes = {
+Subscription.propTypes = {
     classes : PropTypes.object.isRequired,
 }
 
-export default withRouter(withStyles(useStyles)(RecentlyPlayed));
+export default withRouter(withStyles(useStyles)(Subscription));

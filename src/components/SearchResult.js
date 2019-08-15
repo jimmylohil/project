@@ -56,42 +56,51 @@ const useStyles = theme => ({
 });
 
 
-class TrendingPage extends Component {
+class SearchResult extends Component {
     constructor(props){
         super(props);
         this.state = {
-            trending : [],
+            result : [],
             showPlayer : false,
-            willPlay : [],
         }
         this.handlePlayButton = this.handlePlayButton.bind(this);
     }
 
-    secondsToHms(d){
-        d = Number(d);
-      
-        
-        var m = Math.floor(d % 3600 / 60);
-        var s = Math.floor(d % 3600 %60);
-        
-        return ('0' + m).slice(-2) + ":" + ('0'+s).slice(-2);
-      }
+    
+
+      handlePlayButton = (e) => {
+        const value = e.target.id;
+        console.log (value);
+
+        sessionStorage.setItem("uuid", value)
+        // const willPlay = this.state.willPlay
+        // willPlay.push(e.target.id)
+        // this.setState({
+        //     willPlay : e.target.id 
+        // });
+        // console.log(willPlay)
+
+    
+    }
       
 
     componentDidMount(){
         var jwt = sessionStorage.getItem("JWT")
-        axios.get(`http://localhost:80/api/trending?token=${jwt}`)
+        var username = sessionStorage.getItem("username")
+        var search = sessionStorage.getItem("search");
+        console.log(search)
+        axios.get(`http://localhost:80/api/searchPodcast?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImlzZWVsaWFvIiwiaWF0IjoxNTY1ODUxNDgyLCJleHAiOjE1NjU5Mzc4ODJ9.nbNUdHA0qQ6ov8t15GhSSaYdTE5Lw8j5BWzqzvB1WkA&query=${search}&page=1`)
         .then(
             (response) => {
                 console.log("Get Latest Eps succesful")
                 console.log(response)
                 this.setState(
                     {
-                        trending : response.data.episodes,
+                        result : response.data.podcasts,
                         
                     }
                 )
-                console.log(this.state.trending)
+                console.log(this.state.result)
             } 
         )
 
@@ -100,14 +109,20 @@ class TrendingPage extends Component {
         })
     };
 
-    handlePlayButton = (e) => {
-        const value = e.target.id;
-        console.log (value);
+    handlePlayButton = e =>{
+        e.preventDefault();
+        const willPlay = this.state.willPlay
+        willPlay.push(e.target.item)
+        this.setState({
+            willPlay : willPlay 
+        });
+        console.log(this.state.willPlay)
 
-        sessionStorage.setItem("uuid", value)
-        
-
-    
+        // this.props.history.push({
+        //     state:{
+        //     uuid : this.state.uuid,
+        //   }})
+        //   console.log(this.state.uuid);
     }
 
    
@@ -116,7 +131,7 @@ class TrendingPage extends Component {
 
     render(){
         const {classes} = this.props;
-        const {trending} = this.state;
+        const {result} = this.state;
         
         return (
             
@@ -125,12 +140,12 @@ class TrendingPage extends Component {
                 <Grid container alignItems="center" justify="center">
                     <Grid item className={classes.titlegrid} >
                     <Typography variant="h2" className={classes.title}>
-                        Trending
+                        Search Results
                     </Typography>
                     </Grid>
                 </Grid>
             
-                {trending.map((item,i) =>
+                {result.map((item,i) =>
                 {
                     return(
                         <Paper className={classes.paper}>
@@ -138,13 +153,13 @@ class TrendingPage extends Component {
                             <Grid container xs={12}spacing={2}>
                                 <Grid item xs={3}>
                                 <Link to={{
-                                    pathname : `/episodepage/${item.uuid}`,
+                                    pathname : `/showpage/${item.uuid}`,
                                     state : {
-                                        eps_id : `${item.uuid}`
+                                        pod_id : `${item.uuid}`
                                     }
                                 }} className={classes.link}>
                                     <ButtonBase className={classes.image}>
-                                        <img className={classes.img} alt="complex" src={item.podcast.image} />
+                                        <img className={classes.img} alt="complex" src={item.image} />
                                     </ButtonBase>
                                     </Link>
                                 </Grid>
@@ -152,9 +167,9 @@ class TrendingPage extends Component {
                                 <Grid item xs={7} sm container>
                                     <Grid item xs container direction="column" spacing={2}>
                                     <Link to={{
-                                    pathname : `/episodepage/${item.uuid}`,
+                                    pathname : `/showpage/${item.uuid}`,
                                     state : {
-                                        eps_id : `${item.uuid}`
+                                        pod_id : `${item.uuid}`
                                     }
                                 }} className={classes.link}>
                                         <Grid item xs>
@@ -164,7 +179,7 @@ class TrendingPage extends Component {
                                             </Typography>
                                             
                                             <Typography variant="subtitle1" gutterBottom>
-                                                {item.podcast.author}
+                                                {item.author}
                                             </Typography>
                                          
 
@@ -181,7 +196,7 @@ class TrendingPage extends Component {
                                     alignItems="center">
 
                                 <IconButton aria-label="Previous" >
-                                    <PlayCircleOutline className={classes.play} onClick={this.handlePlayButton} id={item.uuid} />                    
+                                    <PlayCircleOutline className={classes.play} onClick={this.handlePlayButton} id={item.uuid}/>                    
                                 </IconButton>
                                     
                                 </Grid>
@@ -207,8 +222,8 @@ class TrendingPage extends Component {
   
 }
 
-TrendingPage.propTypes = {
+SearchResult.propTypes = {
     classes : PropTypes.object.isRequired,
 }
 
-export default withRouter(withStyles(useStyles)(TrendingPage));
+export default withRouter(withStyles(useStyles)(SearchResult));

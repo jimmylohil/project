@@ -83,12 +83,7 @@ class NewReleasePage extends Component {
         console.log (value);
 
         sessionStorage.setItem("uuid", value)
-        // const willPlay = this.state.willPlay
-        // willPlay.push(e.target.id)
-        // this.setState({
-        //     willPlay : e.target.id 
-        // });
-        // console.log(willPlay)
+        
 
     
     }
@@ -186,11 +181,7 @@ class NewReleasePage extends Component {
                                             <Typography variant="subtitle1" gutterBottom>
                                                 {item.podcast.author}
                                             </Typography>
-                                         
-                                            {/* <Typography variant="body2" color="textSecondary">
-                                                ID: 1030114
-                                            </Typography> */}
-
+                                        
                                         </Grid>
                                         </Link>
                                     </Grid>
