@@ -174,7 +174,9 @@ function EpisodePageComp(props) {
       setOpen(false);
     };
 
-    
+    const handlePlayButton = e => {
+        sessionStorage.setItem("uuid", epsid)
+    }
 
 
     return (
@@ -236,6 +238,14 @@ function EpisodePageComp(props) {
                                     direction="row"
                                     justify="flex-start"
                                     alignItems="flex-start">
+                                        <Button 
+                                        variant="contained" 
+                                        color="primary" 
+                                        className={classes.button} 
+                                        onClick={handlePlayButton}>
+
+                                        Play
+                                    </Button>
                                     <Button 
                                         variant="contained" 
                                         color="primary" 

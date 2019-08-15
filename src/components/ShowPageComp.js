@@ -139,14 +139,7 @@ function ShowPageComp(props) {
             );
         };
 
-        function handlePlayButton(e){
-            const value = e.target.id;
-            console.log (value);
-    
-            sessionStorage.setItem("uuid", value)
-            
         
-        }
 
 
     const classes = useStyles();
@@ -225,7 +218,7 @@ function ShowPageComp(props) {
                                     justify="flex-start"
                                     alignItems="flex-start">
                                     <Button variant="contained" color="primary" className={classes.button} onClick={handleSubs}>
-                                        Subsribe
+                                        Subscribe
                                     </Button>
                                 </Grid>
                             </Grid>
@@ -309,18 +302,7 @@ function ShowPageComp(props) {
                                     </Grid>
                                 </Grid>
                                 
-                                <Grid container 
-                                    xs={2}
-                                    spacing={1}
-                                    direction="row"
-                                    justify="center"
-                                    alignItems="center">
-
-                                <IconButton aria-label="Previous" >
-                                    <PlayCircleOutline className={classes.play} onClick={handlePlayButton}/>                    
-                                </IconButton>
-                                    
-                                </Grid>
+                                
                                 </Grid>
                             </Paper>
                 )}
