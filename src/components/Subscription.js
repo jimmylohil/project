@@ -14,6 +14,7 @@ import axios from 'axios';
 import IconButton from '@material-ui/core/IconButton';
 import Player from './Player';
 import HeaderComp from './HeaderComp';
+import { CircularProgress } from '@material-ui/core';
 
 const useStyles = theme => ({
   root: {
@@ -52,7 +53,17 @@ const useStyles = theme => ({
   },
   title:{
       fontWeight : '500',
-  }
+  },
+  circular:{
+    textAlign : 'center',
+  },
+  circularpaper: {
+    padding: theme.spacing(2),
+    margin: 'auto',
+    marginBottom : theme.spacing(2),
+    textAlign : 'center',
+    
+  },
 });
 
 
@@ -63,6 +74,7 @@ class Subscription extends Component {
             subscription : [],
             showPlayer : false,
             willPlay : [],
+            doneSubs : undefined,
         }
         this.handlePlayButton = this.handlePlayButton.bind(this);
     }
@@ -89,7 +101,7 @@ class Subscription extends Component {
                 this.setState(
                     {
                         subscription : response.data.podcasts,
-                        
+                        doneSubs : true,
                     }
                 )
                 console.log(this.state.subscription)
@@ -135,8 +147,14 @@ class Subscription extends Component {
                     </Typography>
                     </Grid>
                 </Grid>
-            
-                {subscription.map((item,i) =>
+
+                {!this.state.doneSubs ? (
+                    <div className = {classes.circularpaper}>
+                        <CircularProgress className = {classes.circular} />
+                        </div>
+                ) :(
+                    <div>
+                        {subscription.map((item,i) =>
                     
                     <Paper className={classes.paper}>
                                     
@@ -190,6 +208,10 @@ class Subscription extends Component {
                     
                     
                 )}
+                        </div>
+                )}
+            
+                
                     
             
              

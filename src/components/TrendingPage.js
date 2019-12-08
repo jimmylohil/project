@@ -13,6 +13,7 @@ import podlogo from '../images/podlogo_text_dark.png';
 import axios from 'axios';
 import IconButton from '@material-ui/core/IconButton';
 import Player from './Player';
+import { CircularProgress } from '@material-ui/core';
 
 
 const useStyles = theme => ({
@@ -52,6 +53,15 @@ const useStyles = theme => ({
   },
   title:{
       fontWeight : '500',
+  },
+  circular :{
+      textAlign : 'center',
+  },
+  circularpaper :{
+      padding : theme.spacing(2),
+      margin  : 'auto',
+      marginBottom : theme.spacing(2),
+      textAlign : 'center',
   }
 });
 
@@ -63,6 +73,7 @@ class TrendingPage extends Component {
             trending : [],
             showPlayer : false,
             willPlay : [],
+            doneTrending : undefined,
         }
         this.handlePlayButton = this.handlePlayButton.bind(this);
     }
@@ -88,7 +99,7 @@ class TrendingPage extends Component {
                 this.setState(
                     {
                         trending : response.data.episodes,
-                        
+                        doneTrending : true,
                     }
                 )
                 console.log(this.state.trending)
@@ -129,8 +140,15 @@ class TrendingPage extends Component {
                     </Typography>
                     </Grid>
                 </Grid>
-            
-                {trending.map((item,i) =>
+
+                {!this.state.doneTrending ? (
+                    <div className={classes.circularpaper}>
+                        <CircularProgress className = {classes.circular} />
+        
+                        </div>
+                 ): (
+                     <div>
+                         {trending.map((item,i) =>
                 {
                     return(
                         <Paper className={classes.paper}>
@@ -197,8 +215,11 @@ class TrendingPage extends Component {
                 
                 )
             }
-            {/* <Player />
-              */}
+                         </div>
+                 )}
+            
+                
+            
             </div>
             
         );

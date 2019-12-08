@@ -14,6 +14,7 @@ import axios from 'axios';
 import IconButton from '@material-ui/core/IconButton';
 import Player from './Player';
 import HeaderComp from './HeaderComp';
+import { CircularProgress } from '@material-ui/core';
 
 const useStyles = theme => ({
   root: {
@@ -52,7 +53,17 @@ const useStyles = theme => ({
   },
   title:{
       fontWeight : '500',
-  }
+  },
+  circular:{
+    textAlign : 'center',
+  },
+  circularpaper: {
+    padding: theme.spacing(2),
+    margin: 'auto',
+    marginBottom : theme.spacing(2),
+    textAlign : 'center',
+    
+  },
 });
 
 
@@ -63,6 +74,7 @@ class RecentlyPlayed extends Component {
             recently : [],
             showPlayer : false,
             willPlay : [],
+            doneRecently : undefined,
         }
         this.handlePlayButton = this.handlePlayButton.bind(this);
     }
@@ -136,7 +148,13 @@ class RecentlyPlayed extends Component {
                     </Grid>
                 </Grid>
             
-                {recently.map((item,i) =>
+            {!this.state.doneRecently ? (
+                <div className={classes.circularpaper}>
+                    <CircularProgress className={classes.circular}/>
+                    </div>
+            ) : (
+                <div>
+                    {recently.map((item,i) =>
                     
                     <Paper className={classes.paper}>
                                     
@@ -205,6 +223,11 @@ class RecentlyPlayed extends Component {
                     
                     
                 )}
+                    </div>
+            )}
+
+                
+                
                     
             
              

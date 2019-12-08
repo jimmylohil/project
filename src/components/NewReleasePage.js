@@ -14,6 +14,7 @@ import axios from 'axios';
 import IconButton from '@material-ui/core/IconButton';
 import Player from './Player';
 import HeaderComp from './HeaderComp';
+import { CircularProgress } from '@material-ui/core';
 
 const useStyles = theme => ({
   root: {
@@ -52,7 +53,17 @@ const useStyles = theme => ({
   },
   title:{
       fontWeight : '500',
-  }
+  },
+  circular:{
+    textAlign : 'center',
+  },
+  circularpaper: {
+    padding: theme.spacing(2),
+    margin: 'auto',
+    marginBottom : theme.spacing(2),
+    textAlign : 'center',
+    
+  },
 });
 
 
@@ -63,6 +74,7 @@ class NewReleasePage extends Component {
             newReleased : [],
             showPlayer : false,
             willPlay : [],
+            doneNew : undefined,
         }
         this.handlePlayButton = this.handlePlayButton.bind(this);
     }
@@ -98,7 +110,7 @@ class NewReleasePage extends Component {
                 this.setState(
                     {
                         newReleased : response.data.episodes,
-                        
+                        doneNew : true,
                     }
                 )
                 console.log(this.state.newReleased)
@@ -144,8 +156,14 @@ class NewReleasePage extends Component {
                     </Typography>
                     </Grid>
                 </Grid>
-            
-                {newReleased.map((item,i) =>
+
+                {!this.state.doneNew ? (
+                    <div className={classes.circularpaper}>
+                        <CircularProgress className = {classes.circular}/>
+                        </div>
+                ) :(
+                    <div>
+                        {newReleased.map((item,i) =>
                 {
                     return(
                         <Paper className={classes.paper}>
@@ -211,6 +229,10 @@ class NewReleasePage extends Component {
                 
                 )
             }
+                    </div>
+                )}
+            
+                
             
              
             </div>

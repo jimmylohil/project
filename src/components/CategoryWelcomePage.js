@@ -322,10 +322,7 @@ class CategoryWelcomePage extends Component{
                                 variant="contained"
                                 color="primary">Continue</Button>
                                 
-                        <Button className={classes.button}
-                                onClick={this.onLogoutClick}
-                                variant="contained"
-                                color="primary">Logout</Button>
+                      
 
                             
 

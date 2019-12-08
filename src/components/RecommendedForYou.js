@@ -13,6 +13,7 @@ import podlogo from '../images/podlogo_text_dark.png';
 import axios from 'axios';
 import IconButton from '@material-ui/core/IconButton';
 import Player from './Player';
+import { CircularProgress } from '@material-ui/core';
 
 
 const useStyles = theme => ({
@@ -52,7 +53,17 @@ const useStyles = theme => ({
   },
   title:{
       fontWeight : '500',
-  }
+  },
+  circular:{
+    textAlign : 'center',
+  },
+  circularpaper: {
+    padding: theme.spacing(2),
+    margin: 'auto',
+    marginBottom : theme.spacing(2),
+    textAlign : 'center',
+    
+  },
 });
 
 
@@ -63,6 +74,7 @@ class RecommendedForYou extends Component {
             recommend : [],
             showPlayer : false,
             willPlay : [],
+            doneRecommend : undefined,
         }
         this.handlePlayButton = this.handlePlayButton.bind(this);
     }
@@ -104,7 +116,7 @@ class RecommendedForYou extends Component {
                 this.setState(
                     {
                         recommend : response.data.podcasts,
-                        
+                        doneRecommend : true,
                     }
                 )
                 console.log(this.state.recommend)
@@ -150,8 +162,14 @@ class RecommendedForYou extends Component {
                     </Typography>
                     </Grid>
                 </Grid>
-            
-                {recommend.map((item,i) =>
+
+                {!this.state.doneRecommend ? (
+                    <div className={classes.circularpaper}>
+                            <CircularProgress className = {classes.circular}/>
+                        </div>
+                ) : (
+                    <div>
+                        {recommend.map((item,i) =>
                 {
                     return(
                         <Paper className={classes.paper}>
@@ -188,10 +206,6 @@ class RecommendedForYou extends Component {
                                                 {item.author}
                                             </Typography>
                                          
-                                            {/* <Typography variant="body2" color="textSecondary">
-                                                ID: 1030114
-                                            </Typography> */}
-
                                         </Grid>
                                         </Link>
                                     </Grid>
@@ -210,8 +224,10 @@ class RecommendedForYou extends Component {
                 
                 )
             }
-            {/* <Player />
-              */}
+                    </div>
+                )}
+        
+            
             </div>
             
         );

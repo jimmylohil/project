@@ -14,6 +14,8 @@ import Paper from '@material-ui/core/Paper';
 import ButtonBase from '@material-ui/core/ButtonBase';
 import IconButton from '@material-ui/core/IconButton';
 import PlayCircleOutline from '@material-ui/icons/PlayCircleOutline';
+import CircularProgress from '@material-ui/core/CircularProgress';
+
 
 const useStyles = theme => ({
     root: {
@@ -48,6 +50,13 @@ const useStyles = theme => ({
         maxWidth: 800,
         
       },
+      circularpaper: {
+        padding: theme.spacing(2),
+        margin: 'auto',
+        marginBottom : theme.spacing(2),
+        textAlign : 'center',
+        
+      },
       image: {
         width: 128,
         height: 128,
@@ -73,8 +82,11 @@ const useStyles = theme => ({
       },
       title:{
           fontWeight : '500',
-      }
+      },
 
+      circular:{
+        textAlign : 'center',
+      }
       
   });
 
@@ -86,7 +98,10 @@ class HomePageComp extends Component {
             newReleased : [],
             recently : [],
             recommend : [],
-
+            doneNew : undefined,
+            doneTrending : undefined,
+            doneRecently : undefined,
+            doneRecommend : undefined,
         };
     };
     handlePlayButton = (e) => {
@@ -115,7 +130,7 @@ class HomePageComp extends Component {
                 this.setState(
                     {
                         trending : response.data.episodes,
-                        
+                        doneTrending : true,
                     }
                 )
                 console.log(this.state.trending)
@@ -130,7 +145,7 @@ class HomePageComp extends Component {
                 this.setState(
                     {
                         newReleased : response.data.episodes,
-                        
+                        doneNew : true,
                     }
                 )
                 console.log(this.state.newReleased)
@@ -145,7 +160,7 @@ class HomePageComp extends Component {
                 this.setState(
                     {
                         recently : response.data.episodes,
-                        
+                        doneRecently : true,
                     }
                 )
                 console.log(this.state.recently)
@@ -161,7 +176,7 @@ class HomePageComp extends Component {
                 this.setState(
                     {
                         recommend : response.data.podcasts,
-                        
+                        doneRecommend : true,
                     }
                 )
                 console.log(this.state.recommend)
@@ -181,66 +196,84 @@ class HomePageComp extends Component {
     return (
         <div className={classes.root}>
             <Container fixed>
+
                 {/* New Release */}
-                <Grid container alignItems="center" justify="left">
-                    <Grid item className={classes.titlegrid} >
+
+            <Grid container alignItems="center" justify="left">
+                <Grid item className={classes.titlegrid} >
                     <Typography variant="h4">
                         New Released
                     </Typography>
-                    </Grid>
                 </Grid>
-
-                <Grid container spacing={3}>
-                {newReleased.slice(0,6).map((item,i)=>
-                <Grid item xs={2}>
-                    <Card className={classes.card}>
-                    <Link to={{
-                                    pathname : `/episodepage/${item.uuid}`,
-                                    state : {
-                                        eps_id : `${item.uuid}`
-                                    }
-                                }} className={classes.link}>
-                      <CardMedia
-                        className={classes.media}
-                        image={item.podcast.image}
-                      />
-                      <CardContent className={classes.content}>
-                      <Grid
-                        container
-                        direction="row"
-                        justify="center"
-                        alignItems="center">
-                        <Typography variant="body2" className={classes.content}>
-                          {item.title}
-                        </Typography>
-                      </Grid>
-                      </CardContent>
-                    </Link>
-                    </Card>
-                </Grid>
-
+            </Grid>
+            {!this.state.doneNew ? (
+                <div className={classes.circularpaper}>
+                    <CircularProgress className={classes.circular}/>
+                </div>
+          
+        ) : (
+            <div>
                 
-                    
-                    )}
-                </Grid>
-                    
 
-                <Grid 
-                    container 
-                    spacing={1}
-                    direction="row"
-                    justify="flex-end"
-                    alignItems="center"
-                    >
-                    <Grid item xs={1}>
-                        <Link to="/newrelease">
-                            <h5>Show More >></h5>
-                        </Link>
-                    </Grid>
-                </Grid>
+        <Grid container spacing={3}>
+        {newReleased.slice(0,6).map((item,i)=>
+        <Grid item xs={2}>
+            <Card className={classes.card}>
+            <Link to={{
+                            pathname : `/episodepage/${item.uuid}`,
+                            state : {
+                                eps_id : `${item.uuid}`
+                            }
+                        }} className={classes.link}>
+              <CardMedia
+                className={classes.media}
+                image={item.podcast.image}
+              />
+              <CardContent className={classes.content}>
+              <Grid
+                container
+                direction="row"
+                justify="center"
+                alignItems="center">
+                <Typography variant="body2" className={classes.content}>
+                  {item.title}
+                </Typography>
+              </Grid>
+              </CardContent>
+            </Link>
+            </Card>
+        </Grid>
+
+        
+            
+            )}
+        </Grid>
+            
+
+        <Grid 
+            container 
+            spacing={1}
+            direction="row"
+            justify="flex-end"
+            alignItems="center"
+            >
+            <Grid item xs={1}>
+                <Link to="/newrelease">
+                    <h5>Show More >></h5>
+                </Link>
+            </Grid>
+        </Grid>
+            </div>
+            
+        )}
+                
+                
 
 
                 {/* TRENDING */}
+
+
+
                 <Grid container alignItems="center" justify="left">
                     <Grid item className={classes.titlegrid} >
                     <Typography variant="h4">
@@ -249,7 +282,14 @@ class HomePageComp extends Component {
                     </Grid>
                 </Grid>
 
-                <Grid container spacing={3}>
+                {!this.state.doneTrending ? (
+                    <div className = {classes.circularpaper}>
+                        <CircularProgress className = {classes.circular}/>
+
+                    </div>
+                ) : (
+                    <div>
+                        <Grid container spacing={3}>
                 {trending.slice(0,6).map((item,i)=>
                 <Grid item xs={2}>
                     <Card className={classes.card}>
@@ -294,7 +334,10 @@ class HomePageComp extends Component {
                             <h5>Show More >></h5>
                         </Link>
                     </Grid>
-                </Grid>                
+                </Grid> 
+                    </div>
+                )}
+                               
 
                 
                 
@@ -307,7 +350,13 @@ class HomePageComp extends Component {
                     </Grid>
                 </Grid>
 
-                <Grid container spacing={3}>
+                {!this.state.doneRecently ? (
+                    <div className = {classes.circularpaper}>
+                        <CircularProgress className = {classes.circular} />
+                    </div>
+                ) : (
+                    <div>
+                        <Grid container spacing={3}>
                 {recently.slice(0,6).map((item,i)=>
                 
                 <Grid item xs={2}>
@@ -351,11 +400,12 @@ class HomePageComp extends Component {
                             <h5>Show More >></h5>
                         </Link>
                     </Grid>
-                </Grid>  
-                
+                </Grid>
+                    </div>
 
+                )}
 
-
+                  
 
                 {/* Recommended For You */}
                 <Grid container alignItems="center" justify="left">
@@ -365,9 +415,14 @@ class HomePageComp extends Component {
                     </Typography>
                     </Grid>
                 </Grid>
-
                 
-                {recommend.slice(0,6).map((item,i)=>
+                {!this.state.doneRecommend ? (
+                    <div className = {classes.circularpaper}>
+                        <CircularProgress className={classes.circular}/>
+                    </div>
+                ) :(
+                    <div>
+                        {recommend.slice(0,6).map((item,i)=>
                 <Paper className={classes.paper}>
                             
                 <Grid container xs={12}spacing={2}>
@@ -426,6 +481,10 @@ class HomePageComp extends Component {
                         </Link>
                     </Grid>
                 </Grid>
+                    </div>
+                )}
+                
+                
             </Container>
         </div>
     )

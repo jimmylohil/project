@@ -14,6 +14,7 @@ import axios from 'axios';
 import IconButton from '@material-ui/core/IconButton';
 import Player from './Player';
 import HeaderComp from './HeaderComp';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 const useStyles = theme => ({
   root: {
@@ -52,7 +53,17 @@ const useStyles = theme => ({
   },
   title:{
       fontWeight : '500',
-  }
+  },
+  circular:{
+    textAlign : 'center',
+  },
+  circularpaper: {
+    padding: theme.spacing(2),
+    margin: 'auto',
+    marginBottom : theme.spacing(2),
+    textAlign : 'center',
+    
+  },
 });
 
 
@@ -64,8 +75,11 @@ class CategoryPage extends Component {
             showPlayer : false,
             categoryName : this.props.location.state.categoryName,
             willPlay : [],
+            page : 1,
+            doneCat : undefined,
         }
         this.handlePlayButton = this.handlePlayButton.bind(this);
+        
     }
 
     secondsToHms(d){
@@ -77,6 +91,7 @@ class CategoryPage extends Component {
         
         return ('0' + m).slice(-2) + ":" + ('0'+s).slice(-2);
       }
+      
       
 
       
@@ -95,12 +110,13 @@ class CategoryPage extends Component {
                 this.setState(
                     {
                         podcastByCategory : response.data.podcasts,
-                        
+                        doneCat : true,
                     }
                 )
                 console.log(this.state.podcastByCategory)
             } 
         )
+        
 
         .catch(function(error){
             console.log(error);
@@ -131,7 +147,7 @@ class CategoryPage extends Component {
         const {classes} = this.props;
         const {podcastByCategory} = this.state;
         const {categoryName} = this.state;
-       
+        const {page} = this.state;
         
         return (
             
@@ -144,83 +160,71 @@ class CategoryPage extends Component {
                     </Typography>
                     </Grid>
                 </Grid>
-            
-                {podcastByCategory.map((item,i) =>(
+
+                {!this.state.doneCat ? (
+                    <div className={classes.circularpaper}>
+                        <CircularProgress className = {classes.circular} />
+                        </div>
+                ) :(
+                    <div>
+                        {podcastByCategory.map((item,i) =>(
                     
-                          <Paper className={classes.paper}>
-                            
-                            <Grid container xs={12}spacing={2}>
-                                <Grid item xs={3}>
-                                <Link to={{
-                                    pathname : `/showpage/${item.uuid}`,
-                                    state : {
-                                        pod_id : `${item.uuid}`
-                                    }
-                                }} className={classes.link}>
-                                    <ButtonBase className={classes.image}>
-                                        <img className={classes.img} alt="complex" src={item.image} />
-                                    </ButtonBase>
-                                </Link>
-                                </Grid>
-
-                                <Grid item xs={7} sm container>
-                                    <Grid item xs container direction="column" spacing={2}>
-                                    <Link to={{
-                                    pathname : `/showpage/${item.uuid}`,
-                                    state : {
-                                        pod_id : `${item.uuid}`
-                                    }
-                                }} className={classes.link}>
-                                        <Grid item xs>
-                                        
-                                            <Typography gutterBottom variant="h6">
-                                                {item.title}
-                                            </Typography>
-                                            
-                                            <Typography variant="subtitle1" gutterBottom>
-                                                {item.author}
-                                            </Typography>
-                                         
-                                            {/* <Typography variant="body2" color="textSecondary">
-                                                ID: 1030114
-                                            </Typography> */}
-
-                                        </Grid>
-                                        </Link>
-                                    </Grid>
-                                </Grid>
-                                
-                                <Grid container 
-                                    xs={2}
-                                    spacing={1}
-                                    direction="row"
-                                    justify="center"
-                                    alignItems="center">
-
-                                
-                                    
-                                </Grid>
-                                </Grid>
-                                           
-                                
-
-                                
-                               
-                            </Paper>
-
-
+                    <Paper className={classes.paper}>
                       
-                )
+                      <Grid container xs={12}spacing={2}>
+                          <Grid item xs={3}>
+                          <Link to={{
+                              pathname : `/showpage/${item.uuid}`,
+                              state : {
+                                  pod_id : `${item.uuid}`
+                              }
+                          }} className={classes.link}>
+                              <ButtonBase className={classes.image}>
+                                  <img className={classes.img} alt="complex" src={item.image} />
+                              </ButtonBase>
+                          </Link>
+                          </Grid>
+    
+                          <Grid item xs={7} sm container>
+                              <Grid item xs container direction="column" spacing={2}>
+                              <Link to={{
+                              pathname : `/showpage/${item.uuid}`,
+                              state : {
+                                  pod_id : `${item.uuid}`
+                              }
+                            }} className={classes.link}>
+                                  <Grid item xs>
+                                  
+                                      <Typography gutterBottom variant="h6">
+                                          {item.title}
+                                      </Typography>
+                                      
+                                      <Typography variant="subtitle1" gutterBottom>
+                                          {item.author}
+                                      </Typography>
+                                   
+                                  </Grid>
+                                  </Link>
+                              </Grid>
+                          </Grid>
+                          </Grid>
+                                     
+                    </Paper>
+          )
+          
+          )
+        }
+         
+         
+      
+      <Link to={`${categoryName}&page=${page}`}>
+                      <h5>Show More >></h5>
+                  </Link>
+                        </div>
+                )}
+
                 
-                    
-                    
-                        
-                    
                 
-                
-                )
-            }
-            
 
              
             </div>

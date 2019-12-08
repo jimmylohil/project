@@ -13,6 +13,7 @@ import podlogo from '../images/podlogo_text_dark.png';
 import axios from 'axios';
 import IconButton from '@material-ui/core/IconButton';
 import Player from './Player';
+import { CircularProgress } from '@material-ui/core';
 
 
 const useStyles = theme => ({
@@ -52,7 +53,17 @@ const useStyles = theme => ({
   },
   title:{
       fontWeight : '500',
-  }
+  },
+  circular:{
+    textAlign : 'center',
+  },
+  circularpaper: {
+    padding: theme.spacing(2),
+    margin: 'auto',
+    marginBottom : theme.spacing(2),
+    textAlign : 'center',
+    
+  },
 });
 
 
@@ -62,6 +73,7 @@ class SearchResult extends Component {
         this.state = {
             result : [],
             showPlayer : false,
+            doneSearch : undefined,
         }
         this.handlePlayButton = this.handlePlayButton.bind(this);
     }
@@ -89,7 +101,7 @@ class SearchResult extends Component {
         var username = sessionStorage.getItem("username")
         var search = sessionStorage.getItem("search");
         console.log(search)
-        axios.get(`http://localhost:80/api/searchPodcast?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImlzZWVsaWFvIiwiaWF0IjoxNTY1ODUxNDgyLCJleHAiOjE1NjU5Mzc4ODJ9.nbNUdHA0qQ6ov8t15GhSSaYdTE5Lw8j5BWzqzvB1WkA&query=${search}&page=1`)
+        axios.get(`http://localhost:80/api/searchPodcast?token=${jwt}&query=${search}&page=1`)
         .then(
             (response) => {
                 console.log("Get Latest Eps succesful")
@@ -97,7 +109,7 @@ class SearchResult extends Component {
                 this.setState(
                     {
                         result : response.data.podcasts,
-                        
+                        doneSearch : true,
                     }
                 )
                 console.log(this.state.result)
@@ -145,7 +157,13 @@ class SearchResult extends Component {
                     </Grid>
                 </Grid>
             
-                {result.map((item,i) =>
+            {!this.state.doneSearch ? (
+                <div className={classes.circularpaper}>
+                    <CircularProgress className={classes.circular}/>
+                    </div>
+            ) :(
+                <div>
+                    {result.map((item,i) =>
                 {
                     return(
                         <Paper className={classes.paper}>
@@ -212,8 +230,11 @@ class SearchResult extends Component {
                 
                 )
             }
-            {/* <Player />
-              */}
+                    </div>
+            )}
+
+                
+            
             </div>
             
         );
