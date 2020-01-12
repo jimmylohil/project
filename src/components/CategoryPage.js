@@ -153,13 +153,7 @@ class CategoryPage extends Component {
             
             <div className={classes.root}>
                 
-                <Grid container alignItems="center" justify="center">
-                    <Grid item className={classes.titlegrid} >
-                    <Typography variant="h2" className={classes.title}>
-                        {categoryName}
-                    </Typography>
-                    </Grid>
-                </Grid>
+                
 
                 {!this.state.doneCat ? (
                     <div className={classes.circularpaper}>
@@ -167,6 +161,13 @@ class CategoryPage extends Component {
                         </div>
                 ) :(
                     <div>
+                    <Grid container alignItems="center" justify="center">
+                    <Grid item className={classes.titlegrid} >
+                    <Typography variant="h2" className={classes.title}>
+                        {categoryName}
+                    </Typography>
+                    </Grid>
+                </Grid>
                         {podcastByCategory.map((item,i) =>(
                     
                     <Paper className={classes.paper}>

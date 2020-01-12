@@ -19,32 +19,30 @@ import ShowPageComp from './components/ShowPageComp';
 import EpisodePageComp from './components/EpisodePageComp';
 import SearchResult from './components/SearchResult';
 import UserPageComp from './components/UserPageComp';
-import Popular from './components/Popular';
+import Playlist from './components/Playlist';
 import Subscription from './components/Subscription';
+
+
 
 class App extends Component{
 
   render(){
-
+    
     return (
-        <BrowserRouter>
+      <BrowserRouter>
           <div className="App">
             <Switch>
-              {/* <Route path="/home" component={HomePageComp} />
-              <Route path = "/header" component={HeaderComp} /> */}
-              <Route exact path="/" component={Login} />
               <Route path="/login" component={Login}/>
               <Route path="/register" component = {Register} />
-              {/* <Route path="/newrelease" component = {NewReleasePage} />
-              <Route path="/categorywelcomepage" component={CategoryWelcomePage} />
-              <Route path="/trending" component={TrendingPage} />
-              <Route path="/category/" component={CategoryPage} />
-              <Route path="/showpage" component={ShowPageComp} />
-              <Route path="/episodepage" component={EpisodePageComp} />
-              <Route path="/recommendedforyou" component={RecommendedForYou} /> */}
-              
-              
-              
+              <Route exact path="/"
+                    render={props =>{
+                      if(this.isLoggedIn()){
+                        return <Redirect to="/home" />
+                      }
+                      else{
+                        return <Redirect to="/login" />
+                      }
+                    }} />
               <Route path="/"
                     render={props =>{
                       if(this.isLoggedIn()){
@@ -65,14 +63,25 @@ class App extends Component{
    isLoggedIn(){
      return sessionStorage.getItem("JWT") != null;
    }
+
+   
   
 }
 
  class LoggedInRoutes extends Component{
+  
+  isPlay(){
+    return sessionStorage.getItem("Player") != null;
+  }
+
+  isPlaying(){
+    return sessionStorage.getItem("isPlaying") != null;
+  }
+
    render(){
      return(
       <div>
-        <HeaderComp />
+        <HeaderComp/>
         <Switch>
           <Route path="/home" component = {HomePageComp} />
           <Route path="/trending" component={TrendingPage} />
@@ -85,10 +94,16 @@ class App extends Component{
           <Route path="/newrelease" component = {NewReleasePage} />
           <Route path="/searchresult" component ={SearchResult} />
           <Route path="/profile" component={UserPageComp} />
-          <Route path="/popular" component={Popular} />
+          <Route path="/playlist" component={Playlist} />
           <Route path="/subscription" component={Subscription} />
         </Switch>
-        <Player />
+        
+        {sessionStorage.setItem("uuid", sessionStorage.getItem("Player"))}
+        { this.isPlay() && 
+            <Player isPlay={this.isPlaying()} />
+        }
+        
+
         
           
       </div>

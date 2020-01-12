@@ -74,40 +74,25 @@ class TrendingPage extends Component {
     constructor(props){
         super(props);
         this.state = {
-            loadingItem :['','','','','','','','','',''],
-            trending : [],
-            showPlayer : false,
-            willPlay : [],
-            doneTrending : undefined,
+            playlist : [],
+            donePlaylist : undefined,
         }
-        this.handlePlayButton = this.handlePlayButton.bind(this);
     }
-
-    secondsToHms(d){
-        d = Number(d);
       
-        
-        var m = Math.floor(d % 3600 / 60);
-        var s = Math.floor(d % 3600 %60);
-        
-        return ('0' + m).slice(-2) + ":" + ('0'+s).slice(-2);
-      }
-      
-
     componentDidMount(){
         var jwt = sessionStorage.getItem("JWT")
-        axios.get(`http://localhost:80/api/trending?token=${jwt}`)
+        axios.get(`http://localhost:80/api/playlist?token=${jwt}`)
         .then(
             (response) => {
-                console.log("Get Latest Eps succesful")
+                console.log("Get Playlist in PlaylistList succesful")
                 console.log(response)
                 this.setState(
                     {
-                        trending : response.data.episodes,
-                        doneTrending : true,
+                        playlist : response.data.playlists,
+                        donePlaylist : true,
                     }
                 )
-                console.log(this.state.trending)
+                console.log(this.state.playlist)
             } 
         )
 
@@ -132,30 +117,30 @@ class TrendingPage extends Component {
 
     render(){
         const {classes} = this.props;
-        const {trending} = this.state;
+        const {playlist} = this.state;
         
         return (
             
             <div className={classes.root}>
 
             {/* Check fetching data from backend */}
-            { !(this.state.doneTrending == true ) ? <LinearProgress color="secondary" /> : null }
+            { !(this.state.donePlaylist == true ) ? <LinearProgress color="secondary" /> : null }
                 
             <Grid container alignItems="center" justify="center">
                 <Grid item className={classes.titlegrid} >
                     <Typography variant="h2" className={classes.title}>
-                        Trending
+                        Playlist
                     </Typography>
                 </Grid>
             </Grid>
 
-            {!this.state.doneTrending ? (
+            {!this.state.donePlaylist ? (
                 <div className={classes.circularpaper}>
                     <CircularProgress className = {classes.circular}/>
                 </div>
             ): (
             <div>
-            {trending.map((item,i) =>{
+            {playlist.map((item,i) =>{
                 return(
                     <Paper className={classes.paper}>
                         
@@ -168,7 +153,7 @@ class TrendingPage extends Component {
                                     }
                                 }} className={classes.link}>
                                     <ButtonBase className={classes.image}>
-                                        <img className={classes.img} alt="complex" src={item.podcast.image} />
+                                        <img className={classes.img} alt="complex" src={podlogo} />
                                     </ButtonBase>
                                 </Link>
                             </Grid>
@@ -183,12 +168,16 @@ class TrendingPage extends Component {
                                 }} className={classes.link}>
                                     <Grid item xs>
                                     
-                                        <Typography gutterBottom variant="h6">
-                                            {item.title}
+                                        <Typography gutterBottom variant="h5">
+                                            {item.name == "" ? "-" : item.name}
                                         </Typography>
                                         
                                         <Typography variant="subtitle1" gutterBottom>
-                                            {item.podcast.author}
+                                            Number of Episodes: {item.episodes.length}
+                                        </Typography>
+
+                                        <Typography variant="subtitle1" gutterBottom>
+                                            Date created: {item.date_created.slice(0,10)}
                                         </Typography>
                                         
 

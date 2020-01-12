@@ -118,6 +118,7 @@ class Register extends Component{
         formErrors.confirmPassword = value != this.state.password
         ? "Password is not same"
         : ""
+        break;
       
       default:
         break;

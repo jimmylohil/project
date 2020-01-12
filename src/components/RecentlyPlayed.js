@@ -16,6 +16,10 @@ import Player from './Player';
 import HeaderComp from './HeaderComp';
 import { CircularProgress } from '@material-ui/core';
 
+import LinearProgress from '@material-ui/core/LinearProgress';
+
+import Skeleton from '@material-ui/lab/Skeleton';
+
 const useStyles = theme => ({
   root: {
     flexGrow: 1,
@@ -71,6 +75,7 @@ class RecentlyPlayed extends Component {
     constructor(props){
         super(props);
         this.state = {
+            loadingItem :['','','','','','','','','',''],
             recently : [],
             showPlayer : false,
             willPlay : [],
@@ -101,7 +106,7 @@ class RecentlyPlayed extends Component {
                 this.setState(
                     {
                         recently : response.data.episodes,
-                        
+                        doneRecently : true,
                     }
                 )
                 console.log(this.state.recently)
@@ -138,101 +143,92 @@ class RecentlyPlayed extends Component {
         
         return (
             
-            <div className={classes.root}>
+        <div className={classes.root}>
                 
-                <Grid container alignItems="center" justify="center">
-                    <Grid item className={classes.titlegrid} >
+            {/* Check fetching data from backend */}
+            { !(this.state.doneRecently == true ) ? <LinearProgress color="secondary" /> : null }
+                
+            <Grid container alignItems="center" justify="center">
+                <Grid item className={classes.titlegrid} >
                     <Typography variant="h2" className={classes.title}>
                         Recently Played
                     </Typography>
-                    </Grid>
                 </Grid>
+            </Grid>
             
             {!this.state.doneRecently ? (
-                <div className={classes.circularpaper}>
-                    <CircularProgress className={classes.circular}/>
-                    </div>
-            ) : (
-                <div>
-                    {recently.map((item,i) =>
-                    
-                    <Paper className={classes.paper}>
+            <Paper className={classes.paper}>
+                <Grid container xs={12}spacing={2}>
+                    {this.state.loadingItem.map((item,i)=>
+                        <Grid container xs={12}spacing={2}>
+                            <Grid item xs={3}>
+                                <Skeleton variant="rect" width={190} height={80}/>
+                            </Grid>
+
+                            <Grid item xs={7} sm container>
+                                <Skeleton width="80%"/>
+                                <Skeleton width="60%" />    
                                     
+                            </Grid>
+                        </Grid>
+                    )}
+                </Grid>
+            </Paper>
+            ) : (
+            <div>
+            {recently.map((item,i) =>{
+                return(
+                <Paper className={classes.paper}>             
                     <Grid container xs={12}spacing={2}>
                         <Grid item xs={3}>
-                        <Link to={{
-                            pathname : `/episodepage/${item.uuid}`,
-                            state : {
-                                eps_id : `${item.uuid}`
-                            }
-                        }} className={classes.link}>
-                            <ButtonBase className={classes.image}>
-                                <img className={classes.img} alt="complex" src={item.podcast.image} />
-                            </ButtonBase>
+                            <Link to={{
+                                pathname : `/episodepage/${item.uuid}`,
+                                state : {
+                                    eps_id : `${item.uuid}`
+                                }
+                            }} className={classes.link}>
+                                <ButtonBase className={classes.image}>
+                                    <img className={classes.img} alt="complex" src={item.podcast.image} />
+                                </ButtonBase>
                             </Link>
                         </Grid>
 
                         <Grid item xs={7} sm container>
                             <Grid item xs container direction="column" spacing={2}>
-                            <Link to={{
-                            pathname : `/episodepage/${item.uuid}`,
-                            state : {
-                                eps_id : `${item.uuid}`
-                            }
-                        }} className={classes.link}>
-                                <Grid item xs>
-                                
-                                    <Typography gutterBottom variant="h6">
-                                        {item.title}
-                                    </Typography>
+                                <Link to={{
+                                    pathname : `/episodepage/${item.uuid}`,
+                                    state : {
+                                        eps_id : `${item.uuid}`
+                                    }
+                                }} className={classes.link}>
+                                    <Grid item xs>
                                     
-                                    <Typography variant="subtitle1" gutterBottom>
-                                        {item.podcast.author}
-                                    </Typography>
-                                 
-                                    {/* <Typography variant="body2" color="textSecondary">
-                                        ID: 1030114
-                                    </Typography> */}
+                                        <Typography gutterBottom variant="h6">
+                                            {item.title}
+                                        </Typography>
+                                        
+                                        <Typography variant="subtitle1" gutterBottom>
+                                            {item.podcast.author}
+                                        </Typography>
+                                    
+                                        {/* <Typography variant="body2" color="textSecondary">
+                                            ID: 1030114
+                                        </Typography> */}
 
-                                </Grid>
+                                    </Grid>
                                 </Link>
                             </Grid>
                         </Grid>
                         
-                        <Grid container 
-                            xs={2}
-                            spacing={1}
-                            direction="row"
-                            justify="center"
-                            alignItems="center">
-
-                        <IconButton aria-label="Previous" onClick={this.handlePlayButton}>
-                            <PlayCircleOutline className={classes.play}/>                    
-                        </IconButton>
                             
-                        </Grid>
-                        </Grid>
-                                   
-                        
-
-                        
-                       
-                    </Paper>
-            
-                    
-                    
-                    
-                )}
-                    </div>
+                    </Grid>
+                </Paper>
+                )}  
+            )}
+            </div>
             )}
 
-                
-                
-                    
-            
-             
-            </div>
-            
+        </div> 
         );
        
 }

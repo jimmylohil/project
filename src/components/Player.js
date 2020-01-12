@@ -25,6 +25,8 @@ import LinearProgress from '@material-ui/core/LinearProgress';
 import ReactPlayer from 'react-player';
 import axios from 'axios';
 import {withRouter} from 'react-router-dom';
+import EpisodePageComp from './EpisodePageComp';
+
 
 function Duration({className, seconds}){
   return(
@@ -136,7 +138,7 @@ class Player extends Component{
   constructor(props){
     super(props);
     this.state = {
-      isPlaying : false,
+      isPlaying : props.isPlay,
       volume : 1,
       loaded : 0,
       played : 0,
@@ -148,8 +150,9 @@ class Player extends Component{
       uuid : "",
       
     }
+    this.state.isPlaying  && sessionStorage.removeItem("isPlaying");
+    console.log("ISPLAYING : " ,this.state.isPlaying)
   }
-
   
 
   load = url => {
@@ -231,9 +234,9 @@ class Player extends Component{
         console.log(error);
     })
     
+     
 
 };
-
  
   handleToggle = e =>{
     var isPlaying = this.state.isPlaying;
@@ -339,13 +342,18 @@ class Player extends Component{
       var ShowPauseIcon = "none"
       var ShowPlayIcon = "inline"
     }
-    else{
+    else if (isPlaying == true){
       var ShowPauseIcon = "inline"
       var ShowPlayIcon = "none"
+    }
+    else{
+      var ShowPauseIcon = "none"
+      var ShowPlayIcon = "inline"
     }
 
     return (
         <div>
+        
             <div className={classes.phantom} />
             
             <ReactPlayer 
@@ -437,6 +445,8 @@ class Player extends Component{
     );
   }
   }
+
+  
  
   Player.propTypes ={
     classes : PropTypes.object.isRequired,

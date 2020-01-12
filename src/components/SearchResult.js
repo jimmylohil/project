@@ -163,6 +163,16 @@ class SearchResult extends Component {
                     </div>
             ) :(
                 <div>
+                    {result.length == 0 ?
+                        <Grid container alignItems="center" justify="center">
+                            <Grid item className={classes.titlegrid} >
+                                <Typography variant="h2" className={classes.title}>
+                                    NO DATA
+                                </Typography>
+                            </Grid>
+                        </Grid>
+                        : null
+                    }
                     {result.map((item,i) =>
                 {
                     return(
@@ -206,18 +216,7 @@ class SearchResult extends Component {
                                     </Grid>
                                 </Grid>
                                 
-                                <Grid container 
-                                    xs={2}
-                                    spacing={1}
-                                    direction="row"
-                                    justify="center"
-                                    alignItems="center">
-
-                                <IconButton aria-label="Previous" >
-                                    <PlayCircleOutline className={classes.play} onClick={this.handlePlayButton} id={item.uuid}/>                    
-                                </IconButton>
-                                    
-                                </Grid>
+                                
                                 </Grid>
                                            
                                 

@@ -65,7 +65,7 @@ const useStyles = makeStyles(theme => ({
     transition: theme.transitions.create('width'),
     width: '100%',
     [theme.breakpoints.up('md')]: {
-      width: 530,
+      width: 600,
     },
   },
   sectionDesktop: {
@@ -86,16 +86,11 @@ const useStyles = makeStyles(theme => ({
   blue: {
     backgroundColor: 'blue',
   },
-  linkTrend : {
-    textDecoration : 'none',
-    color:'white',
-    marginTop : theme.spacing(0.8),
-  },
   link :{
     textDecoration : 'none',
     color : '#3c0b65',
   },
-  linkSubs : {
+  linkButton : {
     color : 'white',
     textDecoration : 'none',
   }
@@ -105,19 +100,25 @@ export default function PrimarySearchAppBar(props) {
   const {history, location, match} = useReactRouter();
 
     const [category, setCategory] = useState([]);
+
+    const classes = useStyles();
+    const [anchorEl, setAnchorEl] = React.useState(null);
+    const [anchorCategoryEl, setAnchorCategoryEl] = React.useState(null);
+    const [search, setSearch] = React.useState("");
+
     useEffect(()=> {
+      
       axios.get('http://localhost:80/api/category/list?token='.concat(sessionStorage.getItem("JWT")))
       .then(
           (res => 
-           setCategory(res.data.categories)));
-       } , []);
+           setCategory(res.data.categories)
+          ));
+
+      }, []);
         
      
 
-  const classes = useStyles();
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const [anchorCategoryEl, setAnchorCategoryEl] = React.useState(null);
-  const [search, setSearch] = React.useState("");
+
 
   function handleClick(event) {
     setAnchorEl(event.currentTarget);
@@ -139,6 +140,7 @@ export default function PrimarySearchAppBar(props) {
     sessionStorage.removeItem("JWT");
     sessionStorage.removeItem("username");
     sessionStorage.removeItem("uuid");
+    sessionStorage.removeItem("Player");
     history.push({
       pathname : "/login"
     })
@@ -162,6 +164,7 @@ export default function PrimarySearchAppBar(props) {
         pathname : "/searchresult"
     })
     sessionStorage.setItem("search",search)
+    window.location.reload(false)
   }
 }
 
@@ -257,7 +260,7 @@ export default function PrimarySearchAppBar(props) {
                     </StyledMenu>
                 </Grid>
               </Grid>
-              <Grid item xs={6}>
+              <Grid item xs={5}>
                 <div className={classes.search}>
                   <div className={classes.searchIcon}>
                     <SearchIcon/>
@@ -275,7 +278,7 @@ export default function PrimarySearchAppBar(props) {
                 </div>
               </Grid>
                 
-              <Grid item xs={3}>
+              <Grid item xs={4}>
                 <Grid 
                     container
                     direction="row"
@@ -284,14 +287,18 @@ export default function PrimarySearchAppBar(props) {
                     >
                   <div className={classes.sectionDesktop}>
                     
-                  <ToolTip title="Subscription">
-                  <Link to = '/subscription' className={classes.linkSubs}>
-                    <IconButton color="inherit">
-                      <Subs />
-                    </IconButton>
+                  <Link to = '/subscription' className={classes.linkButton}>
+                    <Button
+                          aria-controls="customized-menu"
+                          aria-haspopup="true"
+                          variant="text"
+                          color="inherit">
+                        <Subs />
+                        Subscription
+                      </Button>
                     </Link>
-                  </ToolTip>
-                  <Link to = '/trending' className={classes.linkTrend}>
+
+                  <Link to = '/trending' className={classes.linkButton}>
                   <Button
                           aria-controls="customized-menu"
                           aria-haspopup="true"
@@ -321,17 +328,20 @@ export default function PrimarySearchAppBar(props) {
                       onClose={handleClose}
                     >
                       <Box width={200}>
-                        <StyledMenuItem>
                         <Link to={{
-                                    pathname : `/profile`,
-                                    
-                                }} className={classes.link}>
-                          <ListItemText primary="Profile" />
-                          </Link>
-                        </StyledMenuItem>
-                        <StyledMenuItem>
-                          <ListItemText primary="Playlist" />
-                        </StyledMenuItem>
+                          pathname : `/profile`, 
+                        }} className={classes.link}>
+                          <StyledMenuItem>
+                            <ListItemText primary="Profile" />
+                          </StyledMenuItem>
+                        </Link>
+                        <Link to={{
+                          pathname : `/playlist`,
+                        }} className={classes.link}>
+                          <StyledMenuItem>
+                            <ListItemText primary="Playlist" />
+                          </StyledMenuItem>
+                        </Link>
                         <StyledMenuItem>
                           <ListItemText primary="Log Out" onClick={signout}/>
                         </StyledMenuItem>

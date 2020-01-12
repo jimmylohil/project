@@ -21,7 +21,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-export default function CenteredGrid() {
+export default function CenteredGrid(props) {
   const classes = useStyles();
 
   const [value] = React.useState(3);
@@ -52,7 +52,7 @@ export default function CenteredGrid() {
                     direction="row"
                     justify="center"
                     alignItems="center">
-                    <h2 className={classes.title}>Username</h2>
+                    <h2 className={classes.title}>{props.username}</h2>
                 </Grid>
             </Grid>
             {/* Episode Name */}
@@ -71,7 +71,7 @@ export default function CenteredGrid() {
                         direction="row"
                         justify="flex-start"
                         alignItems="flex-start">
-                            <Rating value={value} readOnly /> 
+                            <Rating value={props.rating} readOnly /> 
                         </Grid>
                     </Grid>
                     <Grid item xs ={12}>
@@ -81,7 +81,7 @@ export default function CenteredGrid() {
                         direction="row"
                         justify="flex-start"
                         alignItems="flex-start">
-                            <h5 className={classes.title}>Comment Here</h5>
+                            <h5 className={classes.title}>{props.content}</h5>
                         </Grid>
                     </Grid>  
                 </Grid>

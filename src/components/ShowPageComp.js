@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useRef} from 'react'
+import React , {useEffect, useState} from 'react'
 import { makeStyles } from '@material-ui/core/styles';
 import DownListComp from './DownList/DownListComp'
 import { Grid, Container } from '@material-ui/core';
@@ -17,6 +17,11 @@ import {Link} from 'react-router-dom';
 import IconButton from '@material-ui/core/IconButton';
 import PlayCircleOutline from '@material-ui/icons/PlayCircleOutline';
 
+import {BrowserRouter as Router, Route} from 'react-router-dom';
+
+import LinearProgress from '@material-ui/core/LinearProgress';
+import Skeleton from '@material-ui/lab/Skeleton';
+
 const useStyles = makeStyles(theme => ({
     root: {
       flexGrow: 1,
@@ -25,10 +30,22 @@ const useStyles = makeStyles(theme => ({
         marginBottom:30,
     },
     image: {
-        width: 300,
-        height: 300,
+        width: 250,
+        height: 250,
+        margin: 10,
+        display: 'block',
       },
     img: {
+        width: 150,
+        height: 150,
+        margin: '0',
+        display: 'block',
+      },
+      imageRecommend: {
+        width: 128,
+        height: 128,
+      },
+      imgRecommend: {
         margin: 'auto',
         display: 'block',
         maxWidth: '100%',
@@ -36,7 +53,7 @@ const useStyles = makeStyles(theme => ({
       },
     title: {
         margin:0,
-        marginTop:20,
+        textAlign: 'left',
     },
     podcaster: {
         margin:0,
@@ -46,114 +63,178 @@ const useStyles = makeStyles(theme => ({
     rate: {
         marginTop:6,
     },
-    paper: {
+    rating:{
+        marginTop:30,
+        fontSize:60,
+    },
+    review:{
+        width:410,
+        marginTop:30,
+        marginBottom:10,
+    },
+    textField: {
+        width:410,
+        marginLeft: theme.spacing(1),
+        marginRight: theme.spacing(1),
+      },
+      paper: {
         padding: theme.spacing(2),
         margin: 'auto',
         marginBottom : theme.spacing(2),
         maxWidth: 800,
         
       },
-      image: {
+    heading:{
+        textAlign: 'left' ,
+    },
+    paperEps :{
+        padding: theme.spacing(2),
+        margin: 'auto',
+        marginBottom : theme.spacing(2),
+        maxWidth: 800,
+    },
+    imageEps: {
         width: 128,
         height: 128,
       },
-      img: {
+      imgEps: {
         margin: 'auto',
         display: 'block',
         maxWidth: '100%',
         maxHeight: '100%',
       },
-      play:{
-        width:50,
-        height:50,
-      },
       link:{
-          textDecoration : 'none',
-          color : '#3c0b65',
-      },
-      titlegrid:{
-          color : '#100a26',
-          margin : theme.spacing(5),
-          
-      },
-      title:{
-          fontWeight : '500',
-      },
+        textDecoration : 'none',
+        color : '#3c0b65',
+    },
 }));
 
 function ShowPageComp(props) {
-    const [pod_id, setPodId] = useState([props.location.state.pod_id])
+
+    const pod_id = window.location.href.split('/')[4];
     const [subs, setSubs] = useState([]);
+    const [subsvalue,setSubsvalue] = useState('');
+    const [totalRating, setTotalRating] = useState(0);
     const [show, setShow] = useState([]);
     const [episodelist, setEpisodelist] = useState([]);
     const [relatedPodcast, setRelatedPodcast] = useState([]);
+
+    const [doneShow, setDoneShow] = useState(undefined);
+    const [doneEpisodeList, setDoneEpisodeList] = useState(undefined);
+    const [doneRelatedPodcast, setDoneRelatedPodcast] = useState(undefined);
+    const [doneSubs, setDoneSubs] = useState(undefined);
+    const [doneSubsRender, setDoneSubsRender] = useState(false);
+
     
-
-    var jwt= sessionStorage.getItem("JWT");
+    var jwt = sessionStorage.getItem("JWT");
+    var username = sessionStorage.getItem("username");
     var podid = pod_id;
-    var username = sessionStorage.getItem("username")
-    console.log(podid);
-
-
-    useEffect(()=> {
-        axios.get(`http://localhost:80/api/podcasts/?token=${jwt}&uuid=${podid}`)
-        .then(
-          (res => 
-           setShow(res.data.podcast)));
-        } , []);
-
-    useEffect(()=> {
-        axios.get(`http://localhost:80/api/podcast/episode/?token=${jwt}&podcast_uuid=${podid}`)
-        .then(
-            (res => 
-             setEpisodelist(res.data.episodes)));
-         } , []);
 
     useEffect(()=>{
+        window.scrollTo(0, 0);
+    },[]);
+
+    useEffect(()=>{
+
+        axios.get(`http://localhost:80/api/podcasts/?token=${jwt}&uuid=${podid}`)
+        .then(
+          (res => {
+            setShow(res.data.podcast)
+            setTotalRating(res.data.podcast.total_rating)
+            setDoneShow(true)
+          }),
+          ); 
+
+        axios.get(`http://localhost:80/api/podcast/episode/?token=${jwt}&podcast_uuid=${podid}`)
+        .then(
+            (res =>{
+            setEpisodelist(res.data.episodes)
+            setDoneEpisodeList(true)
+            }),
+            );
+
         axios.get(`http://localhost:80/api/relatedPodcast/?token=${jwt}&uuid=${podid}`)
         .then(
-            (res =>
-                setRelatedPodcast(res.data.recommendations))
-        )
-         }, []);
-
-         useEffect(()=>{
-            axios.get(`http://localhost:80/api/user/?token=${jwt}&username=${username}`)
-            .then(
-                (res =>
-                    setSubs(res.data.subscribed_podcasts),
-                    console.log(subs))
-            )
-             }, []);
-
-       console.log(show);
-       console.log(episodelist);
-       console.log(relatedPodcast);
-       
-
-       function handleSubs(){
-           axios.post(`http://localhost:80/api/subscribe/?token=${jwt}&uuid=${podid}&username=${username}`)
-            .then(
-                (res =>
-                   console.log(res))
+            (res =>{
+                setRelatedPodcast(res.data.recommendations)
+                setDoneRelatedPodcast(true)
+            }),
             );
-        };
-
         
+        axios.get(`http://localhost:80/api/getSubscribedPodcast/?token=${jwt}`)
+        .then(
+            (res =>{
+                setSubs(res.data.podcasts)
+                setDoneSubs(true)
+                console.log("THERE: " , subs)
+            }),
+            );
+        } , [jwt,podid,username,subs]);
 
+        var payload = {
+            "uuid" : podid,
+            "username" : username
+          }
+
+        function handleSubs(){
+            if (subsvalue == 'Subscribe'){
+                setSubsvalue('Subscribed')
+                    axios.post(`http://localhost:80/api/subscribe/?token=${jwt}&uuid=${podid}&username=${username}`,payload)
+                    .then(
+                        function(response){
+                            console.log("SUB" , response);
+                            alert ('Subscribed')
+                        }
+                    )
+                    .catch(function(error){
+                        console.log(error);
+                    })
+            }else{
+                setSubsvalue('Subscribe')
+                axios.post(`http://localhost:80/api/unsubscribe/?token=${jwt}&uuid=${podid}&username=${username}`,payload)
+                .then(
+                    function(response){
+                        console.log("UNSUB" , response);
+                        alert ('Subscribe')
+                    }
+                )
+                .catch(function(error){
+                    console.log(error);
+                })
+        }
+    };
 
     const classes = useStyles();
-    const [expanded, setExpanded] = React.useState(false);
-    const [value] = React.useState(3);
 
-    const handleChange = panel => (event, isExpanded) => {
-        setExpanded(isExpanded ? panel : false);
-    };
+    var subscribed = '';
+    
+    const renderingSubs = () => {
+        subscribed = subs.find((item) => item.uuid == podid )
+        console.log("SUBS ", subscribed);
+
+        if (subscribed == undefined)  {  
+          return setSubsvalue('Subscribe');
+        } else if(subscribed.uuid == podid){
+          return setSubsvalue('Subscribed');
+        }
+        else{
+            return setSubsvalue('Subscribe');
+        }
+    }
 
     return (
         <div className={classes.root}>
-            <Container fixed>
-                {/* Category Name */}
+
+        { !(doneShow == true && doneEpisodeList == true && doneRelatedPodcast == true && doneSubs == true ) 
+        ? <LinearProgress color="secondary" /> : null }
+
+        {/* Check subs */}
+        {(doneSubs == true && subsvalue === '' && doneSubsRender == false) ? renderingSubs() : null } 
+ 
+
+        
+
+        <Container fixed>
                 <Grid 
                     container 
                     spacing={1}
@@ -162,20 +243,21 @@ function ShowPageComp(props) {
                     alignItems="center"
                     className={classes.grid}
                     >
-                    {/* Show Image */}
-                    <Grid item xs={4} >
+                    {/* Episode Image */}
+                    <Grid item xs={3} >
                         <Grid 
                             container 
                             spacing={1}
                             direction="row"
                             justify="center"
                             alignItems="center" >
-                            <ButtonBase className={classes.image}>
-                                <img className={classes.img} alt={images} src={show.image} />
+                            <ButtonBase>
+                            {!doneShow ? <Skeleton variant="rect" width={190} height={190} className={classes.image}/> :
+                                <img className={classes.image} alt="complex" src={show.image} /> }
                             </ButtonBase>
                         </Grid>
                     </Grid>
-                    {/* Show Name */}
+                    {/* Episode Name */}
                     <Grid item xs={7} >
                         <Grid 
                             container 
@@ -185,29 +267,26 @@ function ShowPageComp(props) {
                             alignItems="flex-start"
                             >
                             <Grid item xs ={12}>
-                                <Grid 
-                                container 
-                                spacing={1}
-                                direction="row"
-                                justify="flex-start"
-                                alignItems="flex-start">
-                                    <h2 className={classes.title}>{show.title}</h2>
-                                </Grid>
+                            {!doneShow ? <Skeleton width="50%"/> :
+                                <h2 className={classes.title}>{show.title}</h2>}
                             </Grid>
                             <Grid item xs ={12}>
-                                <h4 className={classes.podcaster}>{show.author}</h4>
+                            {!doneShow ? <Skeleton width="30%"/> :
+                                <h3 className={classes.podcaster}>{show.author}</h3>}
                             </Grid>
-                            <Grid item xs ={3}>
-                                <Rating value={value} readOnly />   
+                            <Grid item xs ={2}>
+                            {!doneShow ? <Skeleton width="50%"/> :
+                                <Rating value={totalRating} readOnly /> }  
                             </Grid>
                             <Grid item xs ={2} >
                                 <Grid 
                                     container 
                                     spacing={1}
                                     direction="row"
-                                    justify="flex-start"
-                                    alignItems="flex-start">
-                                    <h4 className={classes.rate}>3/5</h4>
+                                    justify="center"
+                                    alignItems="center">
+                                    {!doneShow ? null :
+                                    <h4 className={classes.rate}>{totalRating}/5</h4> }
                                 </Grid>
                             </Grid>
                             <Grid item xs ={12}>
@@ -217,114 +296,56 @@ function ShowPageComp(props) {
                                     direction="row"
                                     justify="flex-start"
                                     alignItems="flex-start">
-                                    <Button variant="contained" color="primary" className={classes.button} onClick={handleSubs}>
-                                        Subscribe
-                                    </Button>
+                                    {!doneShow ? null:
+                                        <Button 
+                                        variant="contained" 
+                                        color="primary" 
+                                        className={classes.button} 
+                                        onClick={handleSubs}>
+
+                                        {subsvalue}
+                                    </Button>}
                                 </Grid>
                             </Grid>
 
                         </Grid>
                     </Grid>
-                    {/* About */}
-                    <Grid 
-                        container 
-                        spacing={1}
-                        direction="row"
-                        justify="center"
-                        alignItems="center" >
-                        <Grid item xs ={10} >
-                            <ExpansionPanel 
-                                expanded={expanded === 'panel1'} 
-                                onChange={handleChange('panel1')}>
-                                <ExpansionPanelSummary
-                                    expandIcon={<ExpandMoreIcon />}
-                                    aria-controls="panel1bh-content"
-                                    id="panel1bh-header"
-                                    >
-                                    <Typography>About</Typography>
-                                </ExpansionPanelSummary>
-                                <ExpansionPanelDetails>
-                                    <Typography>
-                                        {show.description}
-                                    </Typography>
-                                </ExpansionPanelDetails>
-                            </ExpansionPanel>
-                        </Grid>
-                    </Grid>               
-                </Grid>   
-                
+                    <Grid item xs ={10}>
+                        <ExpansionPanel classes>
+                            {/* About Tab*/}
+                            <ExpansionPanelSummary
+                                expandIcon={<ExpandMoreIcon />}
+                                aria-controls="panel1a-content"
+                                id="panel1a-header"
+                                >
+                                <Typography style={{textAlign: 'right'}} >About</Typography>
+                            </ExpansionPanelSummary>
+                            <ExpansionPanelDetails>
+                                <Typography>
+                                {show.description == null ? " No data " : show.description}
+                                </Typography>
+                            </ExpansionPanelDetails>
+                        </ExpansionPanel>      
+                    </Grid>
+                </Grid> 
+                {episodelist.length > 0 &&
                 <div>
-                    
-                </div>
+                <h3>Episodes List</h3>
                 {episodelist.map((item,i) =>
                 
                     
-                        <Paper className={classes.paper}>
-                            
-                            <Grid container xs={12}spacing={2}>
-                                <Grid item xs={3}>
-                                <Link to={{
-                                    pathname : `/episodepage/${item.uuid}`,
-                                    state : {
-                                        eps_id : `${item.uuid}`
-                                    }
-                                }} className={classes.link}>
-                                    <ButtonBase className={classes.image}>
-                                        <img className={classes.img} alt={images} src={show.image} />
-                                    </ButtonBase>
-                                    </Link>
-                                </Grid>
-
-                                <Grid item xs={7} sm container>
-                                    <Grid item xs container direction="column" spacing={2}>
-                                    <Link to={{
-                                    pathname : `/episodepage/${item.uuid}`,
-                                    state : {
-                                        eps_id : `${item.uuid}`
-                                    }
-                                }} className={classes.link}>
-                                        <Grid item xs>
-                                        
-                                            <Typography gutterBottom variant="h6">
-                                                {item.title}
-                                            </Typography>
-                                            
-                                            <Typography variant="subtitle1" gutterBottom>
-                                                {show.author}
-                                            </Typography>
-                                         
-                                            {/* <Typography variant="body2" color="textSecondary">
-                                                ID: 1030114
-                                            </Typography> */}
-
-                                        </Grid>
-                                        </Link>
-                                    </Grid>
-                                </Grid>
-                                
-                                
-                                </Grid>
-                            </Paper>
-                )}
-                
-
-                
-                <h3>Related Podcast</h3>
-                {relatedPodcast.map((item,i) =>
-                
-                    
-                <Paper className={classes.paper}>
+                <Paper className={classes.paperEps}>
                     
                     <Grid container xs={12}spacing={2}>
                         <Grid item xs={3}>
                         <Link to={{
-                                    pathname : `/showpage/${item.uuid}`,
+                                    pathname : `/episodepage/${item.uuid}`,
                                     state : {
-                                        pod_id : `${item.uuid}`
+                                        eps_id : `${item.uuid}`
                                     }
                                 }} className={classes.link}>
-                            <ButtonBase className={classes.image}>
-                                <img className={classes.img} alt={images} src={item.image} />
+                            <ButtonBase className={classes.imageEps}>
+                                <img className={classes.imgEps} alt={images} src={show.image} />
                             </ButtonBase>
                             </Link>
                         </Grid>
@@ -332,9 +353,9 @@ function ShowPageComp(props) {
                         <Grid item xs={7} sm container>
                             <Grid item xs container direction="column" spacing={2}>
                             <Link to={{
-                                    pathname : `/showpage/${item.uuid}`,
+                                    pathname : `/episodepage/${item.uuid}`,
                                     state : {
-                                        pod_id : `${item.uuid}`
+                                        eps_id : `${item.uuid}`
                                     },
                                     
                                         
@@ -346,33 +367,70 @@ function ShowPageComp(props) {
                                     </Typography>
                                     
                                     <Typography variant="subtitle1" gutterBottom>
-                                        {item.author}
+                                        {show.author}
                                     </Typography>
                                  
-                                    {/* <Typography variant="body2" color="textSecondary">
-                                        ID: 1030114
-                                    </Typography> */}
 
                                 </Grid>
                                 </Link>
                             </Grid>
                         </Grid>
                         
-                       
                         </Grid>
                     </Paper>
-        )}
+        )}      </div>
+                }
+
+                {relatedPodcast.length > 0 &&
+                <div>
+                <h3>Related Podcast</h3>
+                {relatedPodcast.map((item,i) =>
                 
-                
+                    
+                    <Paper className={classes.paper}>
+                            
+                            <Grid container xs={12}spacing={2}>
+                                <Grid item xs={3}>
+                                <Link to={{
+                                    pathname : `/showpage/${item.uuid}`,
+                                    state : {
+                                        pod_id : `${item.uuid}`
+                                    }
+                                }} className={classes.link}>
+                                    <ButtonBase className={classes.imageRecommend}>
+                                        <img className={classes.imgRecommend} alt="complex" src={item.image} />
+                                    </ButtonBase>
+                                    </Link>
+                                </Grid>
             
+                                <Grid item xs={7} sm container>
+                                    <Grid item xs container direction="column" spacing={2}>
+                                    <Link to={{
+                                    pathname : `/showpage/${item.uuid}`,
+                                    state : {
+                                        pod_id : `${item.uuid}`
+                                    }
+                                }} className={classes.link}>
+                                        <Grid item xs>
+                                        
+                                            <Typography gutterBottom variant="h6">
+                                                {item.title}
+                                            </Typography>
+                                            
+                                            <Typography variant="subtitle1" gutterBottom>
+                                                {item.author}
+                                            </Typography>
             
-
-
-
-
-
-
-
+                                        </Grid>
+                                        </Link>
+                                    </Grid>
+                                </Grid>
+                                
+                                </Grid>
+                            </Paper>
+                )}
+                </div>
+                }
             </Container>
         </div>
     )

@@ -16,6 +16,8 @@ import Player from './Player';
 import HeaderComp from './HeaderComp';
 import { CircularProgress } from '@material-ui/core';
 
+import LinearProgress from '@material-ui/core/LinearProgress';
+
 const useStyles = theme => ({
   root: {
     flexGrow: 1,
@@ -93,7 +95,7 @@ class Subscription extends Component {
     componentDidMount(){
         var jwt = sessionStorage.getItem("JWT")
         var username = sessionStorage.getItem("username")
-        axios.get(`http://localhost:80/api/getSubscribedPodcast/?token=${jwt}&username=${username}`)
+        axios.get(`http://localhost:80/api/getSubscribedPodcast/?token=${jwt}`)
         .then(
             (response) => {
                 console.log("Get Latest Eps succesful")
@@ -139,6 +141,9 @@ class Subscription extends Component {
         return (
             
             <div className={classes.root}>
+
+             {/* Check fetching data from backend */}
+             { !(this.state.doneSubs == true ) ? <LinearProgress color="secondary" /> : null }
                 
                 <Grid container alignItems="center" justify="center">
                     <Grid item className={classes.titlegrid} >

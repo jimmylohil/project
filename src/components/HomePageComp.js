@@ -16,6 +16,11 @@ import IconButton from '@material-ui/core/IconButton';
 import PlayCircleOutline from '@material-ui/icons/PlayCircleOutline';
 import CircularProgress from '@material-ui/core/CircularProgress';
 
+import LinearProgress from '@material-ui/core/LinearProgress';
+
+import Skeleton from '@material-ui/lab/Skeleton';
+import Box from '@material-ui/core/Box';
+
 
 const useStyles = theme => ({
     root: {
@@ -94,6 +99,7 @@ class HomePageComp extends Component {
     constructor(props){
         super(props);
         this.state = {
+            loadingItem :['','','','','',''],
             trending : [],
             newReleased : [],
             recently : [],
@@ -125,7 +131,7 @@ class HomePageComp extends Component {
         axios.get(`http://localhost:80/api/trending?token=${jwt}`)
         .then(
             (response) => {
-                console.log("Get Latest Eps succesful")
+                console.log("Get Trending Eps succesful")
                 console.log(response)
                 this.setState(
                     {
@@ -155,7 +161,7 @@ class HomePageComp extends Component {
         axios.get(`http://localhost:80/api/recent_play/?token=${jwt}&username=${username}`)
         .then(
             (response) => {
-                console.log("Get Latest Eps succesful")
+                console.log("Get Recent Eps succesful")
                 console.log(response)
                 this.setState(
                     {
@@ -171,7 +177,7 @@ class HomePageComp extends Component {
         axios.get(`http://localhost:80/api/getSuggestion?token=${jwt}&username=${username}`)
         .then(
             (response) => {
-                console.log("Get Latest Eps succesful")
+                console.log("Get Suggest Eps succesful")
                 console.log(response)
                 this.setState(
                     {
@@ -179,7 +185,7 @@ class HomePageComp extends Component {
                         doneRecommend : true,
                     }
                 )
-                console.log(this.state.recommend)
+                console.log("REKOMEN: "+ this.state.recommend)
             } 
         )
 
@@ -191,139 +197,160 @@ class HomePageComp extends Component {
 
     render(){
     const {classes} = this.props;
-    const {trending, newReleased, recently, recommend} = this.state;
-    
+    const {trending, newReleased, recently, recommend,loadingItem} = this.state;
+
     return (
         <div className={classes.root}>
+
+            {/* Check fetching data from backend */}
+            { !(this.state.doneNew == true && this.state.doneTrending == true && 
+            this.state.doneTrending == true && this.state.doneRecommend == true) ? <LinearProgress color="secondary" /> : null }
+            
             <Container fixed>
 
-                {/* New Release */}
-
-            <Grid container alignItems="center" justify="left">
-                <Grid item className={classes.titlegrid} >
-                    <Typography variant="h4">
-                        New Released
-                    </Typography>
-                </Grid>
-            </Grid>
+            {/* New Release */}
+            
             {!this.state.doneNew ? (
-                <div className={classes.circularpaper}>
-                    <CircularProgress className={classes.circular}/>
+                <div>
+                    <Grid container spacing={7}>
+                        <Grid item xs >
+                            <Skeleton width="50%"/>
+                        </Grid>
+                    </Grid>  
+                    <Grid container spacing={3}>
+                        {loadingItem.map((item,i)=>
+                        <Grid item xs={2}>
+                            <Skeleton variant="rect" width={190} height={118} />
+                            <Box pt={0.5}>
+                                <Skeleton />
+                                <Skeleton width="60%" />
+                            </Box>
+                        </Grid>
+                        )}
+                    </Grid>
                 </div>
-          
-        ) : (
-            <div>
-                
-
-        <Grid container spacing={3}>
-        {newReleased.slice(0,6).map((item,i)=>
-        <Grid item xs={2}>
-            <Card className={classes.card}>
-            <Link to={{
-                            pathname : `/episodepage/${item.uuid}`,
-                            state : {
-                                eps_id : `${item.uuid}`
-                            }
-                        }} className={classes.link}>
-              <CardMedia
-                className={classes.media}
-                image={item.podcast.image}
-              />
-              <CardContent className={classes.content}>
-              <Grid
-                container
-                direction="row"
-                justify="center"
-                alignItems="center">
-                <Typography variant="body2" className={classes.content}>
-                  {item.title}
-                </Typography>
-              </Grid>
-              </CardContent>
-            </Link>
-            </Card>
-        </Grid>
-
-        
-            
-            )}
-        </Grid>
-            
-
-        <Grid 
-            container 
-            spacing={1}
-            direction="row"
-            justify="flex-end"
-            alignItems="center"
-            >
-            <Grid item xs={1}>
-                <Link to="/newrelease">
-                    <h5>Show More >></h5>
-                </Link>
-            </Grid>
-        </Grid>
-            </div>
-            
-        )}
-                
-                
-
-
-                {/* TRENDING */}
-
-
-
+            ) : (
+            <div>  
                 <Grid container alignItems="center" justify="left">
                     <Grid item className={classes.titlegrid} >
-                    <Typography variant="h4">
-                        Trending
-                    </Typography>
+                        <Typography variant="h4">
+                            New Released
+                        </Typography>
+                    </Grid>
+                </Grid>  
+                <Grid container spacing={3}>
+                    {newReleased.slice(0,6).map((item,i)=>
+                        <Grid item xs={2}>
+                            <Card className={classes.card}>
+                                <Link to={{
+                                                pathname : `/episodepage/${item.uuid}`,
+                                                state : {
+                                                    eps_id : `${item.uuid}`
+                                                }
+                                            }} className={classes.link}>
+                                            
+                                <CardMedia
+                                    className={classes.media}
+                                    image={item.podcast.image}
+                                />
+                                <CardContent className={classes.content}>
+                                    <Grid
+                                        container
+                                        direction="row"
+                                        justify="center"
+                                        alignItems="center">
+                                            <Typography variant="body2" className={classes.content}>
+                                                {item.title}
+                                            </Typography>
+                                    </Grid>
+                                </CardContent>
+                                </Link>
+                            </Card>
+                        </Grid>
+                    )}
+                </Grid>
+                    
+                {newReleased.slice(0,6).length == 6 && 
+                    <Grid 
+                        container 
+                        spacing={1}
+                        direction="row"
+                        justify="flex-end"
+                        alignItems="center"
+                        >
+                        <Grid item xs={1}>
+                            <Link to="/newrelease">
+                                <h5>Show More >></h5>
+                            </Link>
+                        </Grid>
+                    </Grid>
+                }
+            </div>   
+            )}
+                
+            {/* TRENDING */}
+
+            {!this.state.doneTrending ? (
+                <div>
+                    <Grid container spacing={7}>
+                        <Grid item xs >
+                            <Skeleton width="50%"/>
+                        </Grid>
+                    </Grid> 
+                    <Grid container spacing={3}>
+                        {loadingItem.map((item,i)=>
+                            <Grid item xs={2}>
+                            <Skeleton variant="rect" width={190} height={118} />
+                            <Box pt={0.5}>
+                                <Skeleton />
+                                <Skeleton width="60%" />
+                            </Box>
+                        </Grid>
+                        )}
+                </Grid>
+                </div>
+            ) : (
+            <div>
+                <Grid container alignItems="center" justify="left">
+                    <Grid item className={classes.titlegrid} >
+                        <Typography variant="h4">
+                            Trending
+                        </Typography>
                     </Grid>
                 </Grid>
-
-                {!this.state.doneTrending ? (
-                    <div className = {classes.circularpaper}>
-                        <CircularProgress className = {classes.circular}/>
-
-                    </div>
-                ) : (
-                    <div>
-                        <Grid container spacing={3}>
-                {trending.slice(0,6).map((item,i)=>
-                <Grid item xs={2}>
-                    <Card className={classes.card}>
-                    <Link to={{
-                                    pathname : `/episodepage/${item.uuid}`,
-                                    state : {
-                                        eps_id : `${item.uuid}`
-                                    }
-                                }} className={classes.link}>
-                      <CardMedia
-                        className={classes.media}
-                        image={item.podcast.image}
-                      />
-                      <CardContent className={classes.content}>
-                      <Grid
-                        container
-                        direction="row"
-                        justify="center"
-                        alignItems="center">
-                        <Typography variant="body2" className={classes.content}>
-                          {item.title}
-                        </Typography>
-                      </Grid>
-                      </CardContent>
-                    </Link>
-                    </Card>
-                </Grid>
-
-                
-                    
+                <Grid container spacing={3}>
+                    {trending.slice(0,6).map((item,i)=>
+                        <Grid item xs={2}>
+                            <Card className={classes.card}>
+                                <Link to={{
+                                pathname : `/episodepage/${item.uuid}`,
+                                state : {
+                                    eps_id : `${item.uuid}`
+                                }
+                            }} className={classes.link}>
+                            <CardMedia
+                                className={classes.media}
+                                image={item.podcast.image}
+                            />
+                            <CardContent className={classes.content}>
+                                <Grid
+                                container
+                                direction="row"
+                                justify="center"
+                                alignItems="center">
+                                    <Typography variant="body2" className={classes.content}>
+                                    {item.title}
+                                    </Typography>
+                            </Grid>
+                            </CardContent>
+                            </Link>
+                            </Card>
+                        </Grid>
                     )}
                 </Grid>
 
-                <Grid 
+                {trending.slice(0,6).length == 6 &&
+                    <Grid 
                     container 
                     spacing={1}
                     direction="row"
@@ -334,156 +361,179 @@ class HomePageComp extends Component {
                             <h5>Show More >></h5>
                         </Link>
                     </Grid>
-                </Grid> 
-                    </div>
-                )}
-                               
-
-                
-                
-                {/* Recently Played */}
-                <Grid container alignItems="center" justify="left">
-                    <Grid item className={classes.titlegrid} >
-                    <Typography variant="h4">
-                        Recently Played
-                    </Typography>
-                    </Grid>
                 </Grid>
-
-                {!this.state.doneRecently ? (
-                    <div className = {classes.circularpaper}>
-                        <CircularProgress className = {classes.circular} />
-                    </div>
-                ) : (
-                    <div>
-                        <Grid container spacing={3}>
-                {recently.slice(0,6).map((item,i)=>
+                } 
+            </div>
+            )}               
                 
-                <Grid item xs={2}>
-                    <Card className={classes.card}>
-                    <Link to={{
-                                    pathname : `/episodepage/${item.uuid}`,
-                                    state : {
-                                        eps_id : `${item.uuid}`
-                                    }
-                                }} className={classes.link}>
-                      <CardMedia
-                        className={classes.media}
-                        image={item.podcast.image}
-                      />
-                      <CardContent className={classes.content}>
-                      <Grid
-                        container
-                        direction="row"
-                        justify="center"
-                        alignItems="center">
-                        <Typography variant="body2" className={classes.content}>
-                          {item.title}
-                        </Typography>
-                      </Grid>
-                      </CardContent>
-                    </Link>
-                    </Card>
-                </Grid>
-                
-                )}
-                </Grid>
+            {/* Recently Played */}
 
-                <Grid 
-                    container 
-                    spacing={1}
-                    direction="row"
-                    justify="flex-end"
-                    alignItems="center">
-                    <Grid item xs={1}>
-                        <Link to="/recentlyplayed">
-                            <h5>Show More >></h5>
-                        </Link>
-                    </Grid>
-                </Grid>
-                    </div>
-
-                )}
-
-                  
-
-                {/* Recommended For You */}
-                <Grid container alignItems="center" justify="left">
-                    <Grid item className={classes.titlegrid} >
-                    <Typography variant="h4">
-                        Recommended For You
-                    </Typography>
-                    </Grid>
-                </Grid>
-                
-                {!this.state.doneRecommend ? (
-                    <div className = {classes.circularpaper}>
-                        <CircularProgress className={classes.circular}/>
-                    </div>
-                ) :(
-                    <div>
-                        {recommend.slice(0,6).map((item,i)=>
-                <Paper className={classes.paper}>
-                            
-                <Grid container xs={12}spacing={2}>
-                    <Grid item xs={3}>
-                    <Link to={{
-                        pathname : `/showpage/${item.uuid}`,
-                        state : {
-                            pod_id : `${item.uuid}`
-                        }
-                    }} className={classes.link}>
-                        <ButtonBase className={classes.image}>
-                            <img className={classes.img} alt="complex" src={item.image} />
-                        </ButtonBase>
-                        </Link>
-                    </Grid>
-
-                    <Grid item xs={7} sm container>
-                        <Grid item xs container direction="column" spacing={2}>
-                        <Link to={{
-                        pathname : `/showpage/${item.uuid}`,
-                        state : {
-                            pod_id : `${item.uuid}`
-                        }
-                    }} className={classes.link}>
-                            <Grid item xs>
-                            
-                                <Typography gutterBottom variant="h6">
-                                    {item.title}
-                                </Typography>
-                                
-                                <Typography variant="subtitle1" gutterBottom>
-                                    {item.author}
-                                </Typography>
-
+            {!this.state.doneRecently ? (
+                <div>
+                    <Grid container spacing={7}>
+                        <Grid item xs >
+                            <Skeleton width="50%"/>
+                        </Grid>
+                    </Grid> 
+                    <Grid container spacing={3}>
+                        {loadingItem.map((item,i)=>
+                            <Grid item xs={2}>
+                                <Skeleton variant="rect" width={190} height={118} />
+                                <Box pt={0.5}>
+                                    <Skeleton />
+                                    <Skeleton width="60%" />
+                                </Box>
                             </Grid>
+                        )}
+                    </Grid>
+                </div>
+            ) : (
+            <div>
+                {recently.length != 0 &&
+                <Grid container alignItems="center" justify="left">
+                    <Grid item className={classes.titlegrid} >
+                        <Typography variant="h4">
+                            Recently Played
+                        </Typography>
+                    </Grid>
+                </Grid>
+                }
+                <Grid container spacing={3}>
+                    {recently.slice(0,6).map((item,i)=>
+                        <Grid item xs={2}>
+                            <Card className={classes.card}>
+                                <Link to={{
+                                pathname : `/episodepage/${item.uuid}`,
+                                state : {
+                                    eps_id : `${item.uuid}`
+                                }
+                            }} className={classes.link}>
+                            <CardMedia
+                                className={classes.media}
+                                image={item.podcast.image}
+                            />
+                            <CardContent className={classes.content}>
+                                <Grid
+                                    container
+                                    direction="row"
+                                    justify="center"
+                                    alignItems="center">
+                                        <Typography variant="body2" className={classes.content}>
+                                            {item.title}
+                                        </Typography>
+                                </Grid>
+                            </CardContent>
+                            </Link>
+                            </Card>
+                        </Grid>
+                        
+                    )}
+                </Grid>
+                    {recently.slice(0,6).length == 6 &&              
+                    <Grid 
+                        container 
+                        spacing={1}
+                        direction="row"
+                        justify="flex-end"
+                        alignItems="center">
+                        <Grid item xs={1}>
+                            <Link to="/recentlyplayed">
+                                <h5>Show More >></h5>
                             </Link>
                         </Grid>
                     </Grid>
-                    
+                    }
+            </div>
+            )}
+            
+            {/* Recommended For You */}
+                
+            {!this.state.doneRecommend ? (
+            <div>
+                <Grid container spacing={7}>
+                    <Grid item xs >
+                        <Skeleton width="50%"/>
+                    </Grid>
+                </Grid> 
+                <Paper className={classes.paper}>
+                    <Grid container xs={12}spacing={2}>
+                        {loadingItem.map((item,i)=>
+
+                            <Grid container xs={12}spacing={2}>
+                                <Grid item xs={3}>
+                                    <Skeleton variant="rect" width={190} height={80}/>
+                                </Grid>
+
+                                <Grid item xs={7} sm container>
+                                    <Skeleton width="80%"/>
+                                    <Skeleton width="60%" />    
+                                        
+                                </Grid>
+                            </Grid>
+                        )}
                     </Grid>
                 </Paper>
-
-                
-                    
-                    )}
-                
-                <Grid 
-                    container 
-                    spacing={1}
-                    direction="row"
-                    justify="flex-end"
-                    alignItems="center">
-                    <Grid item xs={1}>
-                        <Link to="/recommendedforyou">
-                            <h5>Show More >></h5>
-                        </Link>
-                    </Grid>
+            </div>
+            ) :(
+            <div>
+            <Grid container alignItems="center" justify="left">
+                <Grid item className={classes.titlegrid} >
+                    <Typography variant="h4">
+                        Recommended For You
+                    </Typography>
                 </Grid>
-                    </div>
-                )}
-                
+            </Grid>
+            {recommend.slice(0,6).map((item,i)=>
+                <Paper className={classes.paper}>           
+                    <Grid container xs={12}spacing={2}>
+                        <Grid item xs={3}>
+                            <Link to={{
+                                pathname : `/showpage/${item.uuid}`,
+                                state : {
+                                    pod_id : `${item.uuid}`
+                                }
+                            }} className={classes.link}>
+                                <ButtonBase className={classes.image}>
+                                    <img className={classes.img} alt="complex" src={item.image} />
+                                </ButtonBase>
+                            </Link>
+                        </Grid>
+                        <Grid item xs={7} sm container>
+                            <Grid item xs container direction="column" spacing={2}>
+                                <Link to={{
+                                    pathname : `/showpage/${item.uuid}`,
+                                    state : {
+                                        pod_id : `${item.uuid}`
+                                    }
+                                }} className={classes.link}>
+                                    <Grid item xs>
+                                        <Typography gutterBottom variant="h6">
+                                            {item.title}
+                                        </Typography>
+                                        <Typography variant="subtitle1" gutterBottom>
+                                            {item.author}
+                                        </Typography>
+                                    </Grid>
+                                </Link>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                </Paper>     
+            )}
+            <Grid 
+                container 
+                spacing={1}
+                direction="row"
+                justify="flex-end"
+                alignItems="center">
+                <Grid item xs={3}>
+                    <Link to="/recommendedforyou">
+                        <h5>Show More >></h5>
+                    </Link>
+                </Grid>
+            </Grid>
+            </div>
+            )}
                 
             </Container>
         </div>

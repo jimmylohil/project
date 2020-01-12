@@ -16,6 +16,10 @@ import Player from './Player';
 import HeaderComp from './HeaderComp';
 import { CircularProgress } from '@material-ui/core';
 
+import LinearProgress from '@material-ui/core/LinearProgress';
+
+import Skeleton from '@material-ui/lab/Skeleton';
+
 const useStyles = theme => ({
   root: {
     flexGrow: 1,
@@ -71,6 +75,7 @@ class NewReleasePage extends Component {
     constructor(props){
         super(props);
         this.state = {
+            loadingItem :['','','','','','','','','',''],
             newReleased : [],
             showPlayer : false,
             willPlay : [],
@@ -148,6 +153,9 @@ class NewReleasePage extends Component {
         return (
             
             <div className={classes.root}>
+
+            {/* Check fetching data from backend */}
+            { !(this.state.doneNew == true ) ? <LinearProgress color="secondary" /> : null }
                 
                 <Grid container alignItems="center" justify="center">
                     <Grid item className={classes.titlegrid} >
@@ -158,38 +166,50 @@ class NewReleasePage extends Component {
                 </Grid>
 
                 {!this.state.doneNew ? (
-                    <div className={classes.circularpaper}>
-                        <CircularProgress className = {classes.circular}/>
-                        </div>
-                ) :(
-                    <div>
-                        {newReleased.map((item,i) =>
-                {
-                    return(
-                        <Paper className={classes.paper}>
-                            
+                <Paper className={classes.paper}>
+                    <Grid container xs={12}spacing={2}>
+                        {this.state.loadingItem.map((item,i)=>
                             <Grid container xs={12}spacing={2}>
                                 <Grid item xs={3}>
-                                <Link to={{
-                                    pathname : `/episodepage/${item.uuid}`,
-                                    state : {
-                                        eps_id : `${item.uuid}`
-                                    }
-                                }} className={classes.link}>
-                                    <ButtonBase className={classes.image}>
-                                        <img className={classes.img} alt="complex" src={item.podcast.image} />
-                                    </ButtonBase>
+                                    <Skeleton variant="rect" width={190} height={80}/>
+                                </Grid>
+
+                                <Grid item xs={7} sm container>
+                                    <Skeleton width="80%"/>
+                                    <Skeleton width="60%" />    
+                                        
+                                </Grid>
+                            </Grid>
+                        )}
+                    </Grid>
+                </Paper>
+                ) :(
+                <div>
+                {newReleased.map((item,i) =>{
+                    return(
+                        <Paper className={classes.paper} onClick={this.handlePlayButton} id={item.uuid}>
+                            <Grid container xs={12}spacing={2}>
+                                <Grid item xs={3}>
+                                    <Link to={{
+                                        pathname : `/episodepage/${item.uuid}`,
+                                        state : {
+                                            eps_id : `${item.uuid}`
+                                        }
+                                    }} className={classes.link}>
+                                        <ButtonBase className={classes.image}>
+                                            <img className={classes.img} alt="complex" src={item.podcast.image} />
+                                        </ButtonBase>
                                     </Link>
                                 </Grid>
 
                                 <Grid item xs={7} sm container>
                                     <Grid item xs container direction="column" spacing={2}>
-                                    <Link to={{
-                                    pathname : `/episodepage/${item.uuid}`,
-                                    state : {
-                                        eps_id : `${item.uuid}`
-                                    }
-                                }} className={classes.link}>
+                                        <Link to={{
+                                        pathname : `/episodepage/${item.uuid}`,
+                                        state : {
+                                            eps_id : `${item.uuid}`
+                                        }
+                                    }} className={classes.link}>
                                         <Grid item xs>
                                         
                                             <Typography gutterBottom variant="h6">
@@ -201,39 +221,15 @@ class NewReleasePage extends Component {
                                             </Typography>
                                         
                                         </Grid>
-                                        </Link>
+                                    </Link>
                                     </Grid>
                                 </Grid>
-                                
-                                <Grid container 
-                                    xs={2}
-                                    spacing={1}
-                                    direction="row"
-                                    justify="center"
-                                    alignItems="center">
-
-                                <IconButton aria-label="Previous">
-                                    <PlayCircleOutline className={classes.play} onClick={this.handlePlayButton} id={item.uuid}/>                    
-                                </IconButton>
-                                    
-                                </Grid>
-                                </Grid>
-                                           
-                                
-
-                                
-                               
-                            </Paper>
+                            </Grid>               
+                        </Paper>
                     );
-                }
-                
-                )
-            }
-                    </div>
+                })}
+                </div>
                 )}
-            
-                
-            
              
             </div>
             

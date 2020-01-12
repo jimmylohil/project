@@ -12,14 +12,28 @@ import Button from '@material-ui/core/Button';
 import Rating from '@material-ui/lab/Rating';
 import Modal from '@material-ui/core/Modal';
 import ReviewComp from './ReviewComp';
+import AddToPlaylistModal from './AddToPlaylistModal';
+import AddReviewModal from './AddReviewModal';
 import TextareaAutosize from '@material-ui/core/TextareaAutosize';
-import TextField from '@material-ui/core/TextField'
 import images from '../images/podlogo_text_dark.png';
 import axios from 'axios';
 import Paper from '@material-ui/core/Paper';
 import {Link} from 'react-router-dom';
 import IconButton from '@material-ui/core/IconButton';
 import PlayCircleOutline from '@material-ui/icons/PlayCircleOutline';
+
+import Player from './Player.js';
+import App from '../App.js';
+
+import Skeleton from '@material-ui/lab/Skeleton';
+
+import LinearProgress from '@material-ui/core/LinearProgress';
+import { CircularProgress } from '@material-ui/core';
+
+import Box from '@material-ui/core/Box';
+
+
+var propss;
 
 function getModalStyle() {
     const top = 50 ;
@@ -32,15 +46,13 @@ function getModalStyle() {
     };
   }
 
+
 const useStyles = makeStyles(theme => ({
     root: {
       flexGrow: 1,
     },
     grid: {
         marginBottom:30,
-    },
-    blue:{
-        backgroundColor:'blue',
     },
     image: {
         width: 250,
@@ -114,73 +126,105 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-function EpisodePageComp(props) {
 
-    const [eps_id, setEpsId] = useState([props.location.state.eps_id]);
+
+  export default function EpisodePageComp(props) {
+    propss = props;
+
+    const epsid = window.location.href.split('/')[4];
+    const [isPlay, setIsPlay] = useState(null);
     const [episode, setEpisode] = useState([]);
     const [show, setShow] = useState([]);
-    const [relatedEpisode, setRelatedEpisode] = useState([]);
-    
-    var jwt = sessionStorage.getItem("JWT");
-    var epsid = eps_id;
+    const [reviewList, setReviewList] = useState([]);
 
-    useEffect(()=>{
-        axios.get(`http://localhost:80/api/episodes/?token=${jwt}&uuid=${epsid}`)
-        .then(
-            (res =>
-                setEpisode(res.data.episode)),
-                
-        );
-    }, []);
-
-    console.log(episode);
-    useEffect(()=>{
-        axios.get(`http://localhost:80/api/episodes/?token=${jwt}&uuid=${epsid}`)
-        .then(
-            (res =>
-                setShow(res.data.episode.podcast)),
-                
-        );
-    }, []);
-    console.log(show);
-    
-    useEffect(() => {
-        axios.get(`http://localhost:80/api/relatedEpisode/?token=${jwt}&uuid=${epsid}`)
-        .then(
-            (res =>
-                setRelatedEpisode(res.data.recommendations))
-        )
-    },[]);
-
-    console.log(relatedEpisode);
-
-
-
+    const [relatedEpisode, setRelatedEpisode] = useState([])
+    const [doneEpisode, setDoneEpisode] = useState(undefined)
+    const [doneRelatedEpisode, setDoneRelatedEpisode] = useState(undefined)
 
     const classes = useStyles();
     const [value, setValue] = React.useState(0);
-    const [review, setReview] = React.useState("");
-    const [modalStyle] = React.useState(getModalStyle);
-    const [open, setOpen] = React.useState(false);
-    
-    
-    
-    
-    const handleOpen = () => {
-      setOpen(true);
-    };
-  
-    const handleClose = () => {
-      setOpen(false);
-    };
 
-    const handlePlayButton = e => {
-        sessionStorage.setItem("uuid", epsid)
+    sessionStorage.setItem("uuid", epsid);
+    
+
+
+    var jwt = sessionStorage.getItem("JWT");
+    var username = sessionStorage.getItem("username");
+    var uuid = sessionStorage.getItem("uuid");
+    console.log("EPSID ", epsid)
+    console.log("UUID ", uuid)
+
+    const reloadPage = () =>{
+        window.scrollTo(0, 0);
     }
 
+    useEffect(()=>{
+        reloadPage();
+    },[]);
 
+
+
+    useEffect(()=>{
+        axios.get(`http://localhost:80/api/episodes/?token=${jwt}&uuid=${epsid}`)
+        .then(
+            (res =>{
+                setEpisode(res.data.episode)
+                setShow(res.data.episode.podcast)
+                setReviewList(res.data.episode.reviews)
+                setDoneEpisode(true)
+            }),
+                
+        )
+        .catch(function(error)
+        {
+        console.log(error);
+        alert("Network Error, Please try again");
+        });
+
+        axios.get(`http://localhost:80/api/relatedEpisode/?token=${jwt}&uuid=${epsid}`)
+        .then(
+            (res =>{
+                setRelatedEpisode(res.data.recommendations)
+                setDoneRelatedEpisode(true)
+            }),
+        )
+        .catch(function(error)
+        {
+          console.log(error);
+          alert("Network Error, Please try again");
+        });
+
+        
+
+    }, [epsid,jwt]);
+
+    console.log("Episode + ", episode);
+
+    console.log("Show +", show);
+    
+    console.log("Related Episode + ", relatedEpisode);
+
+    const handlePlayButton = e => {
+        sessionStorage.setItem("Player", epsid)
+        sessionStorage.setItem("isPlaying", true)
+        // setIsPlay(sessionStorage.getItem("Player"))
+        window.location.reload(false)
+    }
+
+    // const showPlayer = () => {
+    //     if (isPlay != null && uuid !== epsid) {  
+    //       return <App />;
+    //     } else {
+    //       return null;
+    //     }
+    // }
+    
     return (
         <div className={classes.root}>
+            {/* Check fetching data from backend */}
+            { !(doneEpisode == true && doneRelatedEpisode == true) 
+                ? <LinearProgress color="secondary" /> : null }
+
             <Container fixed>
                 <Grid 
                     container 
@@ -199,12 +243,20 @@ function EpisodePageComp(props) {
                             justify="center"
                             alignItems="center" >
                             <ButtonBase>
-                                <img className={classes.image} alt="complex" src={show.image} />
+                                {!doneEpisode ? <Skeleton variant="rect" width={190} height={190} className={classes.image}/> :
+                                <img className={classes.image} alt="complex" src={show.image} />}
                             </ButtonBase>
                         </Grid>
                     </Grid>
                     {/* Episode Name */}
+                    
                     <Grid item xs={7} >
+                    {!doneEpisode ?
+                        <Box pt={0.5}>
+                            <Skeleton />
+                            <Skeleton width="60%" />
+                        </Box>
+                    :
                         <Grid 
                             container 
                             spacing={1}
@@ -219,7 +271,7 @@ function EpisodePageComp(props) {
                                 <h3 className={classes.podcaster}>{show.author}</h3>
                             </Grid>
                             <Grid item xs ={2}>
-                                <Rating value={value} readOnly />   
+                                <Rating value={value} readOnly /> 
                             </Grid>
                             <Grid item xs ={2} >
                                 <Grid 
@@ -234,137 +286,29 @@ function EpisodePageComp(props) {
                             <Grid item xs ={12}>
                                 <Grid 
                                     container 
-                                    spacing={1}
+                                    spacing={2}
                                     direction="row"
                                     justify="flex-start"
                                     alignItems="flex-start">
-                                        <Button 
-                                        variant="contained" 
-                                        color="primary" 
-                                        className={classes.button} 
-                                        onClick={handlePlayButton}>
-
-                                        Play
-                                    </Button>
-                                    <Button 
-                                        variant="contained" 
-                                        color="primary" 
-                                        className={classes.button} 
-                                        onClick={handleOpen}>
-
-                                        Review
-                                    </Button>
-                                    {/* ReviewModal */}
-                                    <Modal
-                                        aria-labelledby="simple-modal-title"
-                                        aria-describedby="simple-modal-description"
-                                        open={open}
-                                        onClose={handleClose}
-                                    >
-                                        <div style={modalStyle} className={classes.paper}>
-                                        <Grid 
-                                            container 
-                                            spacing={1}
-                                            direction="row"
-                                            justify="flex-start"
-                                            alignItems="flex-start"
-                                            >
-                                            {/* Episode Image */}
-                                            <Grid item xs={5} >
-                                                <Grid 
-                                                    container 
-                                                    spacing={1}
-                                                    direction="row"
-                                                    justify="center"
-                                                    alignItems="center" >
-                                                    <ButtonBase>
-                                                        <img className={classes.img} alt="complex" src={show.image} />
-                                                    </ButtonBase>
-                                                </Grid>
-                                            </Grid>
-                                            {/* Episode Name */}
-                                            <Grid item xs={7} >
-                                                <Grid 
-                                                    container 
-                                                    spacing={1}
-                                                    direction="row"
-                                                    justify="center"
-                                                    alignItems="center"
-                                                    >
-                                                    <Grid item xs ={12}>
-                                                        <Grid 
-                                                        container 
-                                                        spacing={1}
-                                                        direction="row"
-                                                        justify="flex-start"
-                                                        alignItems="flex-start">
-                                                            <h3>{episode.title}</h3>
-                                                        </Grid>
-                                                    </Grid>
-                                                    <Grid item xs ={12}>
-                                                        <h4 className={classes.podcaster}>{show.author}</h4>
-                                                    </Grid>
-                                                </Grid>
-                                            </Grid>
-                                            <Grid 
-                                                container 
-                                                spacing={1}
-                                                direction="row"
-                                                justify="center"
-                                                alignItems="center"
-                                                >
-                                                <Rating
-                                                    name="simple-controlled"
-                                                    value={value}
-                                                    className={classes.rating}
-                                                    onChange={(event, newValue) => {
-                                                        setValue(newValue);
-                                                    }}
-                                                    />
-                                                <Grid item xs ={12}>
-                                                    <Grid 
-                                                    container 
-                                                    spacing={1}
-                                                    direction="row"
-                                                    justify="flex-start"
-                                                    alignItems="flex-start">
-                                                    <TextField
-                                                        id="outlined-textarea"
-                                                        label="Review"
-                                                        placeholder="Review Here"
-                                                        multiline
-                                                        className={classes.textField}
-                                                        margin="normal"
-                                                        variant="outlined"
-                                                        value = {review}
-                                                        onChange={(event) => {
-                                                        setReview(event.target.value);
-                                                    }}
-                                                    />
-                                                    </Grid>
-                                                </Grid>
-                                            </Grid>
-                                            <Grid 
-                                                container 
-                                                spacing={1}
-                                                direction="row"
-                                                justify="flex-end"
-                                                alignItems="flex-end"
-                                                >
-                                                <Grid item xs ={3}>
-                                                    <Button variant="contained" color="secondary" onClick={handleClose}>Cancel</Button>
-                                                </Grid>
-                                                <Grid item xs ={3}>
-                                                    <Button variant="contained" color="primary" onClick={handleClose} >Save</Button>
-                                                </Grid>
-                                                </Grid>
-                                            </Grid>
-                                        </div>
-                                    </Modal>
+                                    <Grid item>
+                                            <Button 
+                                            variant="contained" 
+                                            color="primary" 
+                                            className={classes.button} 
+                                            onClick={handlePlayButton}>
+                                                Play
+                                            </Button>
+                                    </Grid>  
+                                    <Grid item>
+                                        <AddToPlaylistModal />
+                                    </Grid>   
+                                    <Grid item>
+                                        <AddReviewModal />
+                                    </Grid>                                                 
                                 </Grid>
                             </Grid>
-
                         </Grid>
+                    }
                     </Grid>
                     <Grid item xs ={10}>
                         <ExpansionPanel classes>
@@ -378,7 +322,7 @@ function EpisodePageComp(props) {
                             </ExpansionPanelSummary>
                             <ExpansionPanelDetails>
                                 <Typography>
-                                {episode.description}
+                                {episode.description == null ? " No data " : episode.description}
                                 </Typography>
                             </ExpansionPanelDetails>
                         </ExpansionPanel>
@@ -393,16 +337,16 @@ function EpisodePageComp(props) {
                             </ExpansionPanelSummary>
                             <ExpansionPanelDetails>
                                 <Grid item xs={6}>
-                                    <ReviewComp />
-                                </Grid>
-                                <Grid item xs={6}>
-                                    <ReviewComp />
+                                    {reviewList.length > 1 &&
+                                    <ReviewComp username={reviewList[1].user} rating={reviewList[1].rating} content={reviewList[1].content}/>
+                                    }
                                 </Grid>
                             </ExpansionPanelDetails>
                         </ExpansionPanel>        
                     </Grid>
                 </Grid> 
-
+                {relatedEpisode.length > 0 &&
+                <div>
                 <h3>Related Episodes</h3>
                 {relatedEpisode.map((item,i) =>
                 
@@ -416,7 +360,7 @@ function EpisodePageComp(props) {
                                     state : {
                                         eps_id : `${item.uuid}`
                                     }
-                                }} className={classes.link}>
+                                }} className={classes.link} onClick={reloadPage()}>
                             <ButtonBase className={classes.imageEps}>
                                 <img className={classes.imgEps} alt={images} src={images} />
                             </ButtonBase>
@@ -432,15 +376,16 @@ function EpisodePageComp(props) {
                                     },
                                     
                                         
-                                }} className={classes.link}>
+                                }} className={classes.link} onClick={reloadPage()}>
                                 <Grid item xs>
                                 
-                                    <Typography gutterBottom variant="h6">
+                                    <Typography gutterBottom="true" variant="h6">
                                         {item.title}
                                     </Typography>
                                     
                                     <Typography variant="subtitle1" gutterBottom>
-                                        {item.audio_length}
+                                        {item.description.length >= 150 ? (item.description.slice(0,145)).concat('...') : item.description}
+                                        
                                     </Typography>
                                  
                                     {/* <Typography variant="body2" color="textSecondary">
@@ -452,25 +397,87 @@ function EpisodePageComp(props) {
                             </Grid>
                         </Grid>
                         
-                        <Grid container 
-                            xs={2}
-                            spacing={1}
-                            direction="row"
-                            justify="center"
-                            alignItems="center">
-
-                        <IconButton aria-label="Previous" >
-                            <PlayCircleOutline className={classes.play}  id={item.uuid}/>                    
-                        </IconButton>
-                            
-                        </Grid>
                         </Grid>
                     </Paper>
-        )}  
-                {/* <DownListComp type="DownListUITypeEpisode" id={uuid} url={RecommendedEpisodeUrl}/>         */}
+        )}      </div>
+                }
+                
             </Container>
+            
+            {/* { showPlayer() } */}
         </div>
     )
-}
+};
 
-export default EpisodePageComp
+
+function PlaylistModal(donePlaylist,playlist){
+    const classes = useStyles();
+    const [modalStyle] = React.useState(getModalStyle);
+    const [open, setOpen] = React.useState(false);
+
+    const handleOpen = () => {
+    setOpen(true);
+    };
+
+    const handleClose = () => {
+    setOpen(false);
+    };
+
+    
+    return(
+    <div>
+        <Button 
+            variant="contained" 
+            color="primary" 
+            className={classes.button}
+            onClick={handleOpen}>
+                Add to Playlist
+        </Button>
+
+        <Modal
+        aria-labelledby="simple-modal-title"
+        aria-describedby="simple-modal-description"
+        open={open}
+        onClose={handleClose}
+        >
+        <div style={modalStyle} className={classes.paper}>
+            <Grid
+            container
+            spacing={0}
+            direction="row"
+            alignItems="center"
+            justify="center"
+            >
+                        
+            <Grid container xs={12}spacing={2}>
+                <Grid item>
+                    <Button
+                        aria-controls="customized-menu"
+                        aria-haspopup="true"
+                        variant="text"
+                        color="inherit">
+                            + Create New Playlist
+                    </Button>
+                </Grid>
+                {playlist.map((item,i) =>
+                    <Grid item>
+                        <Button
+                            aria-controls="customized-menu"
+                            aria-haspopup="true"
+                            variant="text"
+                            color="inherit">
+                                {item}
+                        </Button>
+                    </Grid>
+                )
+            }
+  
+                
+            </Grid>
+
+            </Grid> 
+        </div>
+        </Modal>
+    </div>
+    )
+  }
