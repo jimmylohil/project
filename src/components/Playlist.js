@@ -147,7 +147,7 @@ class TrendingPage extends Component {
                         <Grid container xs={12}spacing={2}>
                             <Grid item xs={3}>
                                 <Link to={{
-                                    pathname : `/episodepage/${item.uuid}`,
+                                    pathname : `/playlistPage/${item.sn}`,
                                     state : {
                                         eps_id : `${item.uuid}`
                                     }
@@ -161,7 +161,7 @@ class TrendingPage extends Component {
                             <Grid item xs={7} sm container>
                                 <Grid item xs container direction="column" spacing={2}>
                                     <Link to={{
-                                    pathname : `/episodepage/${item.uuid}`,
+                                    pathname : `/playlistPage/${item.sn}`,
                                     state : {
                                         eps_id : `${item.uuid}`
                                     }

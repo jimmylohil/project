@@ -1,4 +1,5 @@
 import React, {useEffect, useState, useRef} from 'react';
+import {useHistory} from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import AccountCircle from '@material-ui/icons/AccountCircle';
@@ -121,155 +122,17 @@ image3: {
   width: 30,
   margin: 5,
 },
+paperEps :{
+  padding: theme.spacing(2),
+  margin: 'auto',
+  marginBottom : theme.spacing(2),
+  maxWidth: 800,
+},
 }));
 
 
 
-function ChangePasswordModal(){
-  const classes = useStyles();
-  const [modalStyle] = React.useState(getModalStyle);
-  const [open, setOpen] = React.useState(false);
 
-  var [password, setPassword] = React.useState("");
-  var [confirmPassword, setConfirmPassword] = React.useState("");
-  var [formErrorsPassword, setFormErrorsPassword] = React.useState("");
-  var [formErrorsConfirmPassword, setFormErrorsConfirmPassword] = React.useState("");
-  
-    const handleOpen = () => {
-      setOpen(true);
-    };
-  
-    const handleClose = () => {
-      setOpen(false);
-    };
-
-    const settingPassFalse = (value) => {
-      setFormErrorsPassword("Minimum 6 characters required")
-      setPassword(value)
-    }
-
-    const settingPassTrue = (value) => {
-      setFormErrorsPassword("")
-      setPassword(value)
-    }
-
-    const settingConfirmPassFalse = (value) => {
-      setFormErrorsConfirmPassword("Password is not same")
-      setConfirmPassword(value)
-    }
-
-    const settingConfirmPassTrue = (value) => {
-      setFormErrorsConfirmPassword("")
-      setConfirmPassword(value)
-    }
-
-    const onChange = (e) =>{
-      e.preventDefault();
-      const {id, value} = e.target;
-      
-      switch(id){
-        case "password":
-          formErrorsPassword = value.length < 6
-          ? settingPassFalse(value)
-          : settingPassTrue(value)
-          break;
-  
-        case "confirmPassword":
-          formErrorsConfirmPassword = value != password
-          ? settingConfirmPassFalse(value)
-          : settingConfirmPassTrue(value)
-          break;
-        
-        default:
-          break;
-      }
-      // this.setState({formErrors+[id] : value}, console.log(this.state))
-      console.log("PASS", password)
-      console.log("CONFIRMPASS", confirmPassword)
-      console.log("FORMERRORPASS", formErrorsPassword)
-      console.log("FORMERRORCONFIRMPASS", formErrorsConfirmPassword)
-    }
-
-
-
-
-
-    return(
-      <div>
-        <Button variant="contained" color="primary" onClick={handleOpen}>
-          ChangePassword
-        </Button>
-        <Modal
-          aria-labelledby="simple-modal-title"
-          aria-describedby="simple-modal-description"
-          open={open}
-          onClose={handleClose}
-          >
-          <div style={modalStyle} className={classes.paper}>
-            <Grid
-              container
-              spacing={0}
-              direction="row"
-              alignItems="center"
-              justify="center"
-              >
-                <Grid item xs={12}>   
-                  <form noValidate autoComplete="off">
-                    <Grid 
-                        container
-                        direction="column"
-                        justify="center"
-                        alignItems="stretch"
-                        >
-                        
-                        <TextField 
-                          variant="outlined"
-                          type="password"
-                          label="Password"
-                          id="password"
-                          margin="normal"
-                          required
-                          fullWidth 
-                          onChange = {onChange}
-                          helperText = {formErrorsPassword}
-                          error ={formErrorsPassword.length === 0 ? false : true}
-                          />
-                                  
-                        <TextField 
-                          variant="outlined"
-                          type="password"
-                          label="Confirm Password"
-                          id="confirmPassword"
-                          margin="normal"
-                          required
-                          fullWidth 
-                          onChange = {onChange}
-                          helperText = {formErrorsConfirmPassword}
-                          error ={formErrorsConfirmPassword.length === 0 ? false : true}
-                          />
-                        <Grid 
-                          container 
-                          spacing={1}
-                          direction="row"
-                          justify="flex-end"
-                          alignItems="flex-end"
-                          >
-                          <Grid item xs ={3}>
-                              <Button variant="contained" color="secondary" onClick={handleClose}>Cancel</Button>
-                          </Grid>
-                          <Grid item xs ={3}>
-                              <Button variant="contained" color="primary">Save</Button>
-                          </Grid>
-                        </Grid> 
-                      </Grid>
-                  </form>
-                </Grid> 
-              </Grid> 
-          </div>
-        </Modal>
-      </div>
-    )
-}
 
 
 
@@ -284,6 +147,13 @@ export default function UserPageComp() {
   const [doneRecently, setDoneRecently] = useState(undefined)
   const [doneSubscription, setDoneSubscription] = useState(undefined)
   const [donePlaylist, setDonePlaylist] = useState(undefined)
+
+  const [displayPIN, setDisplayPIN] = useState(false);
+
+  const [validate, setValidate] = useState(undefined);
+
+  let history = useHistory();
+  
   var loadingItem =['','','','','',''];
 
   var jwt = sessionStorage.getItem("JWT");
@@ -328,6 +198,63 @@ export default function UserPageComp() {
       })
     } , [jwt,username]);
 
+    const handleSetting = () =>{
+      if (displayPIN == true)  setDisplayPIN(false) 
+      else setDisplayPIN(true)
+
+      axios.post(`http://localhost:80/api/changepwd?token=${jwt}`)
+          .then(
+              (res =>{
+                  if(res.status == 200){
+                      console.log("PIN Sent successful")
+                    }
+            
+                    else if(res.status == 200 ){
+                      console.log("Denied");
+                    }
+              }),
+                  
+          )
+          .catch(function(error)
+          {
+          console.log(error);
+          alert("Network Error, Please try again");
+          });
+    }
+
+    const onChange = (e) =>{
+      e.preventDefault();
+      setValidate(e.target.value);
+      console.log(validate)
+    }
+
+    const handleSubmit = () =>{
+      alert(validate);
+      var payload={
+        "reset_pwd" : validate,
+        "email" : "jlohil1505@gmail.com"
+      }
+        axios.post('http://localhost:80/main/checkResetPwd',payload)
+        .then(
+            function(res){
+                if(res.status == 200 ){
+                    console.log("PIN matched")
+                  }
+          
+                  else if(res.status == 401 ){
+                    console.log("PIN Not Match");
+                  }
+                  else{
+                    console.log("RES", res)
+                  }
+            }
+        )       
+        .catch(function(error) {
+          console.log(error);
+          alert("Network Error, Please try again");
+        });
+    }
+
 
   return (
     <div className={classes.root}>
@@ -360,7 +287,28 @@ export default function UserPageComp() {
                   
                 </Grid>
                 <Grid item xs={12} className={classes.info}>
-                  <EditProfileModal />
+                <Button variant="contained" color="primary" onClick={handleSetting}>
+                  Setting
+                </Button>
+                {displayPIN ? 
+                <Paper className={classes.paperEps}>
+                  <Typography  variant="h4">Verify !</Typography> 
+                  <Typography variant="subtitle2">NB: PIN has been sent to your email</Typography>
+                  <form noValidate autoComplete="off">
+                        <TextField 
+                          variant="outlined"
+                          type="validate"
+                          label="PIN"
+                          id="validate"
+                          margin="normal"
+                          required
+                          fullWidth 
+                          onChange = {onChange}
+                          />
+                          <Button variant="contained" color="secondary" style={{margin: "25px"}} onClick={handleSubmit}>Submit</Button> 
+                  </form>
+                </Paper>
+                 : null }
               </Grid>
             </Grid>
           </Grid>
@@ -369,9 +317,7 @@ export default function UserPageComp() {
             direction="row"
             justify="flex-end"
             alignItems="flex-end">
-            <Button variant="contained" color="primary" >
-              Be A Podcaster
-            </Button>
+            
           </Grid>
         </Grid>
 
@@ -410,7 +356,7 @@ export default function UserPageComp() {
                     <Grid item xs={2}>
                         <Card className={classes.card}>
                             <Link to={{
-                            pathname : `/episodepage/${item.uuid}`,
+                            pathname : `/showpage/${item.uuid}`,
                             state : {
                                 eps_id : `${item.uuid}`
                             }
@@ -589,7 +535,7 @@ export default function UserPageComp() {
               <Grid container spacing={3}>
                 <Grid item xs={4}>
                   <Link to={{
-                      pathname : `/showpage`,
+                      pathname : `/playlistPage/${item.sn}`,
                   }} className={classes.link}>
                     <Paper className={classes.paper}>
                       <ButtonBase

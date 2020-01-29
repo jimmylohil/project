@@ -176,8 +176,8 @@ export default function SimpleModal() {
                           alignItems="flex-start">
                             <TextField
                                 id="outlined-textarea"
-                                label="Review"
-                                placeholder="Review Here"
+                                label="Playlist"
+                                placeholder="Playlist Name"
                                 multiline
                                 className={classes.textField}
                                 margin="normal"

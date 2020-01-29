@@ -36,16 +36,8 @@ export default function CenteredGrid(props) {
             alignItems="center"
             className={classes.grid}
             >
-            {/* Episode Image */}
+            {/* Username */}
             <Grid item xs={4} >
-                <Grid 
-                    container 
-                    spacing={1}
-                    direction="column"
-                    justify="center"
-                    alignItems="center" >
-                    <Avatar alt="Podcast" src={images}className={classes.bigAvatar} />
-                </Grid>
                 <Grid 
                     container 
                     spacing={1}
@@ -55,7 +47,7 @@ export default function CenteredGrid(props) {
                     <h2 className={classes.title}>{props.username}</h2>
                 </Grid>
             </Grid>
-            {/* Episode Name */}
+            {/* Review */}
             <Grid item xs={7} >
                 <Grid 
                     container 

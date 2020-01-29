@@ -141,6 +141,9 @@ const useStyles = makeStyles(theme => ({
     const [doneEpisode, setDoneEpisode] = useState(undefined)
     const [doneRelatedEpisode, setDoneRelatedEpisode] = useState(undefined)
 
+    const [hasReviewed, setHasReviewed] = useState(undefined)
+    const [DoneHasReviewed, setDoneHasReviewed] = useState(undefined)
+
     const classes = useStyles();
     const [value, setValue] = React.useState(0);
 
@@ -178,7 +181,7 @@ const useStyles = makeStyles(theme => ({
         .catch(function(error)
         {
         console.log(error);
-        alert("Network Error, Please try again");
+        alert("Network Error, Please try again 1");
         });
 
         axios.get(`http://localhost:80/api/relatedEpisode/?token=${jwt}&uuid=${epsid}`)
@@ -191,7 +194,20 @@ const useStyles = makeStyles(theme => ({
         .catch(function(error)
         {
           console.log(error);
-          alert("Network Error, Please try again");
+          alert("Network Error, Please try again 2");
+        });
+
+        axios.get(`http://localhost:80/api/hasReviewed/?token=${jwt}&username=${username}&uuid=${epsid}`)
+        .then(
+            (res =>{
+                setHasReviewed(res.data.hasReviewed)
+                setDoneHasReviewed(true)
+            }),
+        )
+        .catch(function(error)
+        {
+          console.log(error);
+          alert("Network Error, Please try again 3");
         });
 
         
@@ -218,6 +234,8 @@ const useStyles = makeStyles(theme => ({
     //       return null;
     //     }
     // }
+
+
     
     return (
         <div className={classes.root}>
@@ -251,7 +269,7 @@ const useStyles = makeStyles(theme => ({
                     {/* Episode Name */}
                     
                     <Grid item xs={7} >
-                    {!doneEpisode ?
+                    {!(doneEpisode && DoneHasReviewed) ?
                         <Box pt={0.5}>
                             <Skeleton />
                             <Skeleton width="60%" />
@@ -265,13 +283,13 @@ const useStyles = makeStyles(theme => ({
                             alignItems="flex-start"
                             >
                             <Grid item xs ={12}>
-                                <h2 className={classes.title}>{episode.title}</h2>
+                                <h2 className={classes.title}>{episode.title.length >= 150 ? (episode.title.slice(0,145)).concat('...') : episode.title}</h2>
                             </Grid>
                             <Grid item xs ={12}>
                                 <h3 className={classes.podcaster}>{show.author}</h3>
                             </Grid>
                             <Grid item xs ={2}>
-                                <Rating value={value} readOnly /> 
+                                <Rating value={episode.reviews.id} readOnly /> 
                             </Grid>
                             <Grid item xs ={2} >
                                 <Grid 
@@ -280,7 +298,7 @@ const useStyles = makeStyles(theme => ({
                                     direction="row"
                                     justify="center"
                                     alignItems="center">
-                                    <h4 className={classes.rate}>{value}/5</h4>
+                                    <h4 className={classes.rate}>{show.total_rating}/5</h4>
                                 </Grid>
                             </Grid>
                             <Grid item xs ={12}>
@@ -303,7 +321,10 @@ const useStyles = makeStyles(theme => ({
                                         <AddToPlaylistModal />
                                     </Grid>   
                                     <Grid item>
-                                        <AddReviewModal />
+                                    {hasReviewed ? null : <AddReviewModal />}
+                                    {console.log("HasReviewed", hasReviewed)}
+                                    
+                                        
                                     </Grid>                                                 
                                 </Grid>
                             </Grid>
@@ -338,7 +359,9 @@ const useStyles = makeStyles(theme => ({
                             <ExpansionPanelDetails>
                                 <Grid item xs={6}>
                                     {reviewList.length > 1 &&
-                                    <ReviewComp username={reviewList[1].user} rating={reviewList[1].rating} content={reviewList[1].content}/>
+                                        reviewList.map((item,i) =>
+                                            <ReviewComp username={item.user} rating={item.rating} content={item.content}/>
+                                        )
                                     }
                                 </Grid>
                             </ExpansionPanelDetails>
@@ -362,7 +385,7 @@ const useStyles = makeStyles(theme => ({
                                     }
                                 }} className={classes.link} onClick={reloadPage()}>
                             <ButtonBase className={classes.imageEps}>
-                                <img className={classes.imgEps} alt={images} src={images} />
+                                <img className={classes.imgEps} alt={images} src={item.podcast.image} />
                             </ButtonBase>
                             </Link>
                         </Grid>

@@ -56,8 +56,23 @@ export default function SimpleModal() {
   const handleClose = () => {
     setOpen(false);
   };
+  
+  const handleChoosePlaylist = (sn) => {
+    console.log("SN "+ sn);
+    axios.get(`http://localhost:80/api/insertToPlaylist?token=${jwt}&sn=${sn}&uuid=${uuid}`)
+      .then(
+          (res) => {
+              console.log("Succesful")
+          } 
+      )
+      .catch(function(error){
+          console.log(error);
+      })
+      handleClose();
+  }
 
   var jwt = sessionStorage.getItem("JWT");
+  var uuid = sessionStorage.getItem("uuid");
 
   const [playlist, setPlaylist] = useState([]);
   const [donePlaylist, setDonePlaylist] = useState(undefined)
@@ -124,7 +139,8 @@ export default function SimpleModal() {
                           aria-controls="customized-menu"
                           aria-haspopup="true"
                           variant="text"
-                          color="inherit">
+                          color="inherit"
+                          onClick={handleChoosePlaylist}>
                               {item.name == "" ? "-" : item.name}
                       </Button>
                   </Grid>

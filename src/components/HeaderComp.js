@@ -107,7 +107,6 @@ export default function PrimarySearchAppBar(props) {
     const [search, setSearch] = React.useState("");
 
     useEffect(()=> {
-      
       axios.get('http://localhost:80/api/category/list?token='.concat(sessionStorage.getItem("JWT")))
       .then(
           (res => 
@@ -117,7 +116,10 @@ export default function PrimarySearchAppBar(props) {
       }, []);
         
      
-
+  function resetFlag() {
+    setAnchorEl(null);
+    setAnchorCategoryEl(null);
+  }
 
 
   function handleClick(event) {
@@ -248,7 +250,7 @@ export default function PrimarySearchAppBar(props) {
                         }
                           
 
-                          } className={classes.link}>
+                          } className={classes.link} onClick={resetFlag}>
                           <MenuItem>
                             <Typography variant="inherit">{item}</Typography>
                           </MenuItem>
@@ -266,7 +268,7 @@ export default function PrimarySearchAppBar(props) {
                     <SearchIcon/>
                   </div>
                   <InputBase
-                    placeholder="Search"
+                    placeholder={sessionStorage.getItem("search") ? sessionStorage.getItem("search") : "Search"}
                     classes={{
                       root: classes.inputRoot,
                       input: classes.inputInput,
@@ -330,14 +332,14 @@ export default function PrimarySearchAppBar(props) {
                       <Box width={200}>
                         <Link to={{
                           pathname : `/profile`, 
-                        }} className={classes.link}>
+                        }} className={classes.link} onClick={resetFlag}>
                           <StyledMenuItem>
                             <ListItemText primary="Profile" />
                           </StyledMenuItem>
                         </Link>
                         <Link to={{
                           pathname : `/playlist`,
-                        }} className={classes.link}>
+                        }} className={classes.link} onClick={resetFlag}>
                           <StyledMenuItem>
                             <ListItemText primary="Playlist" />
                           </StyledMenuItem>

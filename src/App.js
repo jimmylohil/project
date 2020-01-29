@@ -20,6 +20,7 @@ import EpisodePageComp from './components/EpisodePageComp';
 import SearchResult from './components/SearchResult';
 import UserPageComp from './components/UserPageComp';
 import Playlist from './components/Playlist';
+import PlaylistPage from './components/PlaylistPage';
 import Subscription from './components/Subscription';
 
 
@@ -32,6 +33,15 @@ class App extends Component{
       <BrowserRouter>
           <div className="App">
             <Switch>
+            <Route path="/login"
+                    render={props =>{
+                      if(this.isLoggedIn()){
+                        return <Redirect to="/home" />
+                      }
+                      else{
+                        return  <Route path="/login" component = {Login} />
+                      }
+                    }} />
               <Route path="/login" component={Login}/>
               <Route path="/register" component = {Register} />
               <Route exact path="/"
@@ -95,6 +105,7 @@ class App extends Component{
           <Route path="/searchresult" component ={SearchResult} />
           <Route path="/profile" component={UserPageComp} />
           <Route path="/playlist" component={Playlist} />
+          <Route path="/playlistPage" component={PlaylistPage} />
           <Route path="/subscription" component={Subscription} />
         </Switch>
         

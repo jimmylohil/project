@@ -12,6 +12,9 @@ import Rating from '@material-ui/lab/Rating';
 import TextField from '@material-ui/core/TextField'
 import AccountCircle from '@material-ui/icons/AccountCircle';
 
+import ChangePasswordModal from './ChangePasswordModal';
+import ValidationPasswordModal from './ValidationPasswordModal';
+
 
 
 function getModalStyle() {
@@ -60,6 +63,9 @@ img: {
 textField: {
     marginLeft: theme.spacing(1),
     marginRight: theme.spacing(1),
+  },
+  buttonPass: {
+    margin : '5' 
   },
 }));
 
@@ -145,14 +151,14 @@ export default function SimpleModal() {
                           margin="normal"
                           variant="outlined"
                         />
-                        <Grid item xs={12}>
+                        <Grid item xs={12} >
                           <Grid
                             container
                             direction="row"
                             justify="center"
                             alignItems="center"
                           >   
-                          HELLO       
+                          <ValidationPasswordModal />   
                           
                           </Grid>
                         </Grid>

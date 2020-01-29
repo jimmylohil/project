@@ -166,10 +166,10 @@ function ShowPageComp(props) {
             (res =>{
                 setSubs(res.data.podcasts)
                 setDoneSubs(true)
-                console.log("THERE: " , subs)
+                console.log("THERE: " )
             }),
             );
-        } , [jwt,podid,username,subs]);
+        } , [jwt,podid]);
 
         var payload = {
             "uuid" : podid,
