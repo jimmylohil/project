@@ -7,10 +7,12 @@ import Grid from '@material-ui/core/Grid';
 import { CircularProgress } from '@material-ui/core';
 import axios from 'axios';
 
+import Paper from '@material-ui/core/Paper';
 import CreatePlaylist from './CreatePlaylist';
 import ButtonBase from '@material-ui/core/ButtonBase';
 import Typography from '@material-ui/core/Typography';
 import AddCircle from '@material-ui/icons/AddCircle';
+import images from '../images/podlogo_text_dark.png';
 
 function rand() {
   return Math.round(Math.random() * 20) - 10;
@@ -34,13 +36,17 @@ const useStyles = makeStyles(theme => ({
     backgroundColor: theme.palette.background.paper,
     border: '2px solid #000',
     boxShadow: theme.shadows[5],
-    padding: theme.spacing(2, 4, 3),
+    padding: theme.spacing(2, 4, 4),
+    outline: 'none',
   },
   image2: {
     height : 20,
     width: 20,
     margin: 5,
   },
+  circular :{
+    textAlign : 'center',
+},
 }));
 
 export default function SimpleModal() {
@@ -59,16 +65,21 @@ export default function SimpleModal() {
   
   const handleChoosePlaylist = (sn) => {
     console.log("SN "+ sn);
-    axios.get(`http://localhost:80/api/insertToPlaylist?token=${jwt}&sn=${sn}&uuid=${uuid}`)
-      .then(
-          (res) => {
-              console.log("Succesful")
-          } 
-      )
-      .catch(function(error){
-          console.log(error);
-      })
-      handleClose();
+
+    var payload ={
+      "sn" : sn,
+      "uuid" : uuid
+    }
+    console.log("PAYLOAD" , payload)
+
+    axios.put(`http://localhost:80/api/insertToPlaylist?token=${jwt}&sn=${sn}&uuid=${uuid}`,payload)
+    .then(
+      res => {
+      console.log(res)
+      alert("Berhasil")
+      }
+    )
+    setOpen(false)
   }
 
   var jwt = sessionStorage.getItem("JWT");
@@ -129,28 +140,28 @@ export default function SimpleModal() {
                         <CreatePlaylist />
                     </Typography>
                 </ButtonBase> 
+                </Grid>
+                {!donePlaylist && <CircularProgress className = {classes.circular}/>}
+                {donePlaylist == true ?
+                  playlist.map((item,i)=>
+                <Grid item xs={8}>
+                    <ButtonBase
+                      aria-controls="customized-menu"
+                      aria-haspopup="true"
+                      variant="text"
+                      color="inherit"
+                      onClick={ () => handleChoosePlaylist(`${item.sn}`)}>
+                        <Typography variant="h6"> 
+                          {item.name == "" ? "-" : item.name} ({item.episodes.length})
+                        </Typography>
+                    </ButtonBase>
+                  </Grid>
+                  )
+                  : null}
 
               </Grid>
-          {! donePlaylist ?
-              <CircularProgress className={classes.circular}/> : 
-              playlist.map((item,i) =>
-                  <Grid item xs={8}>
-                      <Button
-                          aria-controls="customized-menu"
-                          aria-haspopup="true"
-                          variant="text"
-                          color="inherit"
-                          onClick={handleChoosePlaylist}>
-                              {item.name == "" ? "-" : item.name}
-                      </Button>
-                  </Grid>
-              )
-          }
+             </Grid>
 
-              
-          </Grid>
-
-          </Grid> 
       </div>
       </Modal>
   </div>

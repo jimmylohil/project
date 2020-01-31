@@ -121,7 +121,6 @@ function ShowPageComp(props) {
 
     const [doneShow, setDoneShow] = useState(undefined);
     const [doneEpisodeList, setDoneEpisodeList] = useState(undefined);
-    const [doneRelatedPodcast, setDoneRelatedPodcast] = useState(undefined);
     const [doneSubs, setDoneSubs] = useState(undefined);
     const [doneSubsRender, setDoneSubsRender] = useState(false);
 
@@ -150,14 +149,6 @@ function ShowPageComp(props) {
             (res =>{
             setEpisodelist(res.data.episodes)
             setDoneEpisodeList(true)
-            }),
-            );
-
-        axios.get(`http://localhost:80/api/relatedPodcast/?token=${jwt}&uuid=${podid}`)
-        .then(
-            (res =>{
-                setRelatedPodcast(res.data.recommendations)
-                setDoneRelatedPodcast(true)
             }),
             );
         
@@ -209,6 +200,7 @@ function ShowPageComp(props) {
     var subscribed = '';
     
     const renderingSubs = () => {
+        setDoneSubsRender(true)
         subscribed = subs.find((item) => item.uuid == podid )
         console.log("SUBS ", subscribed);
 
@@ -225,7 +217,7 @@ function ShowPageComp(props) {
     return (
         <div className={classes.root}>
 
-        { !(doneShow == true && doneEpisodeList == true && doneRelatedPodcast == true && doneSubs == true ) 
+        { !(doneShow == true && doneEpisodeList == true && doneSubs == true ) 
         ? <LinearProgress color="secondary" /> : null }
 
         {/* Check subs */}
@@ -381,56 +373,6 @@ function ShowPageComp(props) {
         )}      </div>
                 }
 
-                {relatedPodcast.length > 0 &&
-                <div>
-                <h3>Related Podcast</h3>
-                {relatedPodcast.map((item,i) =>
-                
-                    
-                    <Paper className={classes.paper}>
-                            
-                            <Grid container xs={12}spacing={2}>
-                                <Grid item xs={3}>
-                                <Link to={{
-                                    pathname : `/showpage/${item.uuid}`,
-                                    state : {
-                                        pod_id : `${item.uuid}`
-                                    }
-                                }} className={classes.link}>
-                                    <ButtonBase className={classes.imageRecommend}>
-                                        <img className={classes.imgRecommend} alt="complex" src={item.image} />
-                                    </ButtonBase>
-                                    </Link>
-                                </Grid>
-            
-                                <Grid item xs={7} sm container>
-                                    <Grid item xs container direction="column" spacing={2}>
-                                    <Link to={{
-                                    pathname : `/showpage/${item.uuid}`,
-                                    state : {
-                                        pod_id : `${item.uuid}`
-                                    }
-                                }} className={classes.link}>
-                                        <Grid item xs>
-                                        
-                                            <Typography gutterBottom variant="h6">
-                                                {item.title}
-                                            </Typography>
-                                            
-                                            <Typography variant="subtitle1" gutterBottom>
-                                                {item.author}
-                                            </Typography>
-            
-                                        </Grid>
-                                        </Link>
-                                    </Grid>
-                                </Grid>
-                                
-                                </Grid>
-                            </Paper>
-                )}
-                </div>
-                }
             </Container>
         </div>
     )

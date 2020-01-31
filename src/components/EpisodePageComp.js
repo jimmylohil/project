@@ -93,13 +93,10 @@ const useStyles = makeStyles(theme => ({
         marginRight: theme.spacing(1),
       },
     paper: {
-        position: 'absolute',
-        width: 400,
-        backgroundColor: theme.palette.background.paper,
-        border: '2px solid #000',
-        boxShadow: theme.shadows[5],
-        padding: theme.spacing(2, 4, 4),
-        outline: 'none',
+        padding: theme.spacing(2),
+        margin: 'auto',
+        marginBottom : theme.spacing(2),
+        maxWidth: 800,
       },
     heading:{
         textAlign: 'left' ,
@@ -124,6 +121,16 @@ const useStyles = makeStyles(theme => ({
         textDecoration : 'none',
         color : '#3c0b65',
     },
+    imageRecommend: {
+        width: 128,
+        height: 128,
+      },
+      imgRecommend: {
+        margin: 'auto',
+        display: 'block',
+        maxWidth: '100%',
+        maxHeight: '100%',
+      },
 }));
 
 
@@ -132,17 +139,19 @@ const useStyles = makeStyles(theme => ({
     propss = props;
 
     const epsid = window.location.href.split('/')[4];
-    const [isPlay, setIsPlay] = useState(null);
     const [episode, setEpisode] = useState([]);
     const [show, setShow] = useState([]);
     const [reviewList, setReviewList] = useState([]);
 
-    const [relatedEpisode, setRelatedEpisode] = useState([])
+    const [relatedPodcast, setRelatedPodcast] = useState([])
     const [doneEpisode, setDoneEpisode] = useState(undefined)
-    const [doneRelatedEpisode, setDoneRelatedEpisode] = useState(undefined)
+    const [doneRelatedPodcast, setDoneRelatedPodcast] = useState(undefined)
 
     const [hasReviewed, setHasReviewed] = useState(undefined)
     const [DoneHasReviewed, setDoneHasReviewed] = useState(undefined)
+
+    const [doneRenderingRelatedPodcast, setDoneRenderingRelatedPodcast] = useState(false)
+    const [doneRenderingReview, setDoneRenderingReview] = useState(false)
 
     const classes = useStyles();
     const [value, setValue] = React.useState(0);
@@ -168,7 +177,7 @@ const useStyles = makeStyles(theme => ({
 
 
     useEffect(()=>{
-        axios.get(`http://localhost:80/api/episodes/?token=${jwt}&uuid=${epsid}`)
+        axios.get(`http://localhost:80/api/episodes/?token=${jwt}&uuid=${uuid}`)
         .then(
             (res =>{
                 setEpisode(res.data.episode)
@@ -184,20 +193,7 @@ const useStyles = makeStyles(theme => ({
         alert("Network Error, Please try again 1");
         });
 
-        axios.get(`http://localhost:80/api/relatedEpisode/?token=${jwt}&uuid=${epsid}`)
-        .then(
-            (res =>{
-                setRelatedEpisode(res.data.recommendations)
-                setDoneRelatedEpisode(true)
-            }),
-        )
-        .catch(function(error)
-        {
-          console.log(error);
-          alert("Network Error, Please try again 2");
-        });
-
-        axios.get(`http://localhost:80/api/hasReviewed/?token=${jwt}&username=${username}&uuid=${epsid}`)
+        axios.get(`http://localhost:80/api/hasReviewed/?token=${jwt}&username=${username}&uuid=${uuid}`)
         .then(
             (res =>{
                 setHasReviewed(res.data.hasReviewed)
@@ -212,13 +208,42 @@ const useStyles = makeStyles(theme => ({
 
         
 
-    }, [epsid,jwt]);
+    }, [uuid,jwt]);
+
+    const renderingRelatedPodcast = () => {
+        
+        axios.get(`http://localhost:80/api/relatedPodcast/?token=${jwt}&uuid=${episode.podcast.uuid}`)
+        .then(
+            (res =>{
+                setRelatedPodcast(res.data.recommendations)
+                setDoneRelatedPodcast(true)
+                setDoneRenderingRelatedPodcast(true)
+            }),
+            );
+        }
+    
+    var review = '';
+
+    const renderingReview = () => {
+        setDoneRenderingReview(true)
+        review = episode.reviews.find((item) => item.user == username )
+        console.log("REVIEW", review)
+        if (review == undefined)  {  
+            return setValue(0);
+          } else if(review.user == username){
+            return setValue(review.rating);
+          }
+          else{
+              return setValue(0);
+          }
+        
+        }
 
     console.log("Episode + ", episode);
 
     console.log("Show +", show);
     
-    console.log("Related Episode + ", relatedEpisode);
+    console.log("Related Podcast + ", relatedPodcast);
 
     const handlePlayButton = e => {
         sessionStorage.setItem("Player", epsid)
@@ -227,21 +252,19 @@ const useStyles = makeStyles(theme => ({
         window.location.reload(false)
     }
 
-    // const showPlayer = () => {
-    //     if (isPlay != null && uuid !== epsid) {  
-    //       return <App />;
-    //     } else {
-    //       return null;
-    //     }
-    // }
-
+    
+    
+   
 
     
     return (
         <div className={classes.root}>
             {/* Check fetching data from backend */}
-            { !(doneEpisode == true && doneRelatedEpisode == true) 
+            { !(doneEpisode == true && doneRelatedPodcast == true) 
                 ? <LinearProgress color="secondary" /> : null }
+
+            {(doneEpisode == true && doneRenderingRelatedPodcast == false) && renderingRelatedPodcast()}
+            {(doneEpisode == true && doneRenderingReview == false) && renderingReview()}
 
             <Container fixed>
                 <Grid 
@@ -289,7 +312,7 @@ const useStyles = makeStyles(theme => ({
                                 <h3 className={classes.podcaster}>{show.author}</h3>
                             </Grid>
                             <Grid item xs ={2}>
-                                <Rating value={episode.reviews.id} readOnly /> 
+                                <Rating value={value} readOnly /> 
                             </Grid>
                             <Grid item xs ={2} >
                                 <Grid 
@@ -298,7 +321,7 @@ const useStyles = makeStyles(theme => ({
                                     direction="row"
                                     justify="center"
                                     alignItems="center">
-                                    <h4 className={classes.rate}>{show.total_rating}/5</h4>
+                                    <h4 className={classes.rate}>{value}/5</h4>
                                 </Grid>
                             </Grid>
                             <Grid item xs ={12}>
@@ -368,61 +391,55 @@ const useStyles = makeStyles(theme => ({
                         </ExpansionPanel>        
                     </Grid>
                 </Grid> 
-                {relatedEpisode.length > 0 &&
+                {relatedPodcast.length > 0 &&
                 <div>
-                <h3>Related Episodes</h3>
-                {relatedEpisode.map((item,i) =>
+                <h3>Related Podcast</h3>
+                {relatedPodcast.map((item,i) =>
                 
                     
-                <Paper className={classes.paperEps}>
-                    
-                    <Grid container xs={12}spacing={2}>
-                        <Grid item xs={3}>
-                        <Link to={{
-                                    pathname : `/episodepage/${item.uuid}`,
+                    <Paper className={classes.paper}>
+                            
+                            <Grid container xs={12}spacing={2}>
+                                <Grid item xs={3}>
+                                <Link to={{
+                                    pathname : `/showpage/${item.uuid}`,
                                     state : {
-                                        eps_id : `${item.uuid}`
+                                        pod_id : `${item.uuid}`
                                     }
-                                }} className={classes.link} onClick={reloadPage()}>
-                            <ButtonBase className={classes.imageEps}>
-                                <img className={classes.imgEps} alt={images} src={item.podcast.image} />
-                            </ButtonBase>
-                            </Link>
-                        </Grid>
-
-                        <Grid item xs={7} sm container>
-                            <Grid item xs container direction="column" spacing={2}>
-                            <Link to={{
-                                    pathname : `/episodepage/${item.uuid}`,
-                                    state : {
-                                        eps_id : `${item.uuid}`
-                                    },
-                                    
-                                        
-                                }} className={classes.link} onClick={reloadPage()}>
-                                <Grid item xs>
-                                
-                                    <Typography gutterBottom="true" variant="h6">
-                                        {item.title}
-                                    </Typography>
-                                    
-                                    <Typography variant="subtitle1" gutterBottom>
-                                        {item.description.length >= 150 ? (item.description.slice(0,145)).concat('...') : item.description}
-                                        
-                                    </Typography>
-                                 
-                                    {/* <Typography variant="body2" color="textSecondary">
-                                        ID: 1030114
-                                    </Typography> */}
-
+                                }} className={classes.link}>
+                                    <ButtonBase className={classes.imageRecommend}>
+                                        <img className={classes.imgRecommend} alt="complex" src={item.image} />
+                                    </ButtonBase>
+                                    </Link>
                                 </Grid>
-                                </Link>
-                            </Grid>
-                        </Grid>
-                        
-                        </Grid>
-                    </Paper>
-        )}      </div>
+            
+                                <Grid item xs={7} sm container>
+                                    <Grid item xs container direction="column" spacing={2}>
+                                    <Link to={{
+                                    pathname : `/showpage/${item.uuid}`,
+                                    state : {
+                                        pod_id : `${item.uuid}`
+                                    }
+                                }} className={classes.link}>
+                                        <Grid item xs>
+                                        
+                                            <Typography gutterBottom variant="h6">
+                                                {item.title}
+                                            </Typography>
+                                            
+                                            <Typography variant="subtitle1" gutterBottom>
+                                                {item.author}
+                                            </Typography>
+            
+                                        </Grid>
+                                        </Link>
+                                    </Grid>
+                                </Grid>
+                                
+                                </Grid>
+                            </Paper>
+                )}
+                </div>
                 }
                 
             </Container>
@@ -431,76 +448,3 @@ const useStyles = makeStyles(theme => ({
         </div>
     )
 };
-
-
-function PlaylistModal(donePlaylist,playlist){
-    const classes = useStyles();
-    const [modalStyle] = React.useState(getModalStyle);
-    const [open, setOpen] = React.useState(false);
-
-    const handleOpen = () => {
-    setOpen(true);
-    };
-
-    const handleClose = () => {
-    setOpen(false);
-    };
-
-    
-    return(
-    <div>
-        <Button 
-            variant="contained" 
-            color="primary" 
-            className={classes.button}
-            onClick={handleOpen}>
-                Add to Playlist
-        </Button>
-
-        <Modal
-        aria-labelledby="simple-modal-title"
-        aria-describedby="simple-modal-description"
-        open={open}
-        onClose={handleClose}
-        >
-        <div style={modalStyle} className={classes.paper}>
-            <Grid
-            container
-            spacing={0}
-            direction="row"
-            alignItems="center"
-            justify="center"
-            >
-                        
-            <Grid container xs={12}spacing={2}>
-                <Grid item>
-                    <Button
-                        aria-controls="customized-menu"
-                        aria-haspopup="true"
-                        variant="text"
-                        color="inherit">
-                            + Create New Playlist
-                    </Button>
-                </Grid>
-                {playlist.map((item,i) =>
-                    <Grid item>
-                        <Button
-                            aria-controls="customized-menu"
-                            aria-haspopup="true"
-                            variant="text"
-                            color="inherit">
-                                {item}
-                        </Button>
-                    </Grid>
-                )
-            }
-  
-                
-            </Grid>
-
-            </Grid> 
-        </div>
-        </Modal>
-    </div>
-    )
-  }

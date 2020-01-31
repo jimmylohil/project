@@ -506,7 +506,7 @@ export default function UserPageComp() {
           </div>
         ) : (
         <div>
-            {recently.length !== 0 &&
+            
             <Grid container alignItems="center" justify="left">
                 <Grid item className={classes.titlegrid} >
                     <Typography variant="h4">
@@ -514,7 +514,7 @@ export default function UserPageComp() {
                     </Typography>
                 </Grid>
             </Grid>
-            }
+            
             <Grid container spacing={3}>
               <Grid item xs={4}>
                   <Paper className={classes.paper}>

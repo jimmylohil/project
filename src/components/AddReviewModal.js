@@ -70,6 +70,8 @@ export default function SimpleModal() {
   const [episode, setEpisode] = useState([]);
   const [show, setShow] = useState([]);
   const [reviewList, setReviewList] = useState([]);
+
+  const [doneEpisode, setDoneEpisode] = useState(undefined);
   
   var jwt = sessionStorage.getItem("JWT");
   var username = sessionStorage.getItem("username");
@@ -93,6 +95,7 @@ export default function SimpleModal() {
                 setEpisode(res.data.episode)
                 setShow(res.data.episode.podcast)
                 setReviewList(res.data.episode.reviews)
+                setDoneEpisode(true)
             }),
                 
         )
@@ -153,6 +156,7 @@ export default function SimpleModal() {
           onClose={handleClose}
       >
           <div style={modalStyle} className={classes.paper}>
+          {doneEpisode ? 
           <Grid 
               container 
               spacing={1}
@@ -189,7 +193,8 @@ export default function SimpleModal() {
                           direction="row"
                           justify="flex-start"
                           alignItems="flex-start">
-                              <h3>{episode.title.length >= 150 ? (episode.title.slice(0,145)).concat('...') : episode.title}</h3>
+                                <h3>{episode.title.length >= 150 ? (episode.title.slice(0,145)).concat('...') : episode.title}</h3>
+
                           </Grid>
                       </Grid>
                       <Grid item xs ={12}>
@@ -250,6 +255,7 @@ export default function SimpleModal() {
                   </Grid>
                   </Grid>
           </Grid>
+          : null}
           </div>
       </Modal>
   </div>

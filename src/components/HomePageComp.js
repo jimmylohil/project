@@ -233,9 +233,11 @@ class HomePageComp extends Component {
             <div>  
                 <Grid container alignItems="center" justify="left">
                     <Grid item className={classes.titlegrid} >
-                        <Typography variant="h4">
-                            New Released
-                        </Typography>
+                        <Link to="/newrelease" className={classes.link}>    
+                            <Typography variant="h4">
+                                New Released
+                            </Typography>
+                        </Link>
                     </Grid>
                 </Grid>  
                 <Grid container spacing={3}>
@@ -313,9 +315,11 @@ class HomePageComp extends Component {
             <div>
                 <Grid container alignItems="center" justify="left">
                     <Grid item className={classes.titlegrid} >
-                        <Typography variant="h4">
-                            Trending
-                        </Typography>
+                        <Link to="/trending" className={classes.link}> 
+                            <Typography variant="h4">
+                                Trending
+                            </Typography>
+                        </Link>
                     </Grid>
                 </Grid>
                 <Grid container spacing={3}>
@@ -392,9 +396,11 @@ class HomePageComp extends Component {
                 {recently.length != 0 &&
                 <Grid container alignItems="center" justify="left">
                     <Grid item className={classes.titlegrid} >
-                        <Typography variant="h4">
-                            Recently Played
-                        </Typography>
+                        <Link to="/recentlyplayed" className={classes.link}> 
+                            <Typography variant="h4">
+                                Recently Played
+                            </Typography>
+                        </Link>
                     </Grid>
                 </Grid>
                 }
@@ -478,9 +484,11 @@ class HomePageComp extends Component {
             <div>
             <Grid container alignItems="center" justify="left">
                 <Grid item className={classes.titlegrid} >
-                    <Typography variant="h4">
-                        Recommended For You
-                    </Typography>
+                    <Link to="/recommendedforyou" className={classes.link}> 
+                        <Typography variant="h4">
+                            Recommended For You
+                        </Typography>
+                    </Link>
                 </Grid>
             </Grid>
             {recommend.slice(0,6).map((item,i)=>
