@@ -155,6 +155,7 @@ class Register extends Component{
         console.log(response);
         if(response.status == 200 && response.data.error == null){
           console.log("Registration successful");
+          alert("Registration successful");
           
           let authToken = response.data.token;
           sessionStorage.setItem("JWT", authToken);
@@ -168,9 +169,19 @@ class Register extends Component{
           
         
         }
+        else if(response.status == 200 && response.data.error == true && 
+                response.data.message.errmsg.search("email_1") !== -1 ){
+          console.log("Email already registered");
+          alert("Email already registered");
+        }
+        else if(response.status == 200 && response.data.error == true && 
+                response.data.message.errmsg.search("username_1") !== -1 ){
+          console.log("Username already registered");
+          alert("Username already registered");
+  }
         else if(response.status == 401 && response.data.error == true){
           console.log("Missing Fields");
-          alert("Missing Fields")
+          alert("Missing Fields");
         }
       }
     )

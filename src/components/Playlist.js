@@ -61,6 +61,9 @@ const useStyles = theme => ({
   circular :{
       textAlign : 'center',
   },
+  center :{
+    textAlign : 'center',
+},
   circularpaper :{
       padding : theme.spacing(2),
       margin  : 'auto',
@@ -192,6 +195,8 @@ class TrendingPage extends Component {
             })}
             </div>
             )}
+
+            {(this.state.donePlaylist == true && playlist.length == 0) ? <h1 className={classes.center}>You haven’t created any playlist yet</h1> : null }
             
         </div> 
         );

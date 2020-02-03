@@ -59,6 +59,9 @@ const useStyles = theme => ({
   circular:{
     textAlign : 'center',
   },
+  center :{
+    textAlign : 'center',
+},
   circularpaper: {
     padding: theme.spacing(2),
     margin: 'auto',
@@ -215,6 +218,10 @@ class Subscription extends Component {
                 )}
                         </div>
                 )}
+
+                
+            {(this.state.doneSubs == true && subscription.length == 0) ? <h1 className={classes.center}>You haven’t subscribed any podcast yet</h1> : null }
+            
             
                 
                     
