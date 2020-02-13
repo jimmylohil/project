@@ -25,6 +25,8 @@ import PlayCircleOutline from '@material-ui/icons/PlayCircleOutline';
 import Player from './Player.js';
 import App from '../App.js';
 
+import Chip from '@material-ui/core/Chip';
+
 import Skeleton from '@material-ui/lab/Skeleton';
 
 import LinearProgress from '@material-ui/core/LinearProgress';
@@ -174,8 +176,6 @@ const useStyles = makeStyles(theme => ({
         reloadPage();
     },[]);
 
-
-
     useEffect(()=>{
         axios.get(`http://localhost:80/api/episodes/?token=${jwt}&uuid=${uuid}`)
         .then(
@@ -226,24 +226,23 @@ const useStyles = makeStyles(theme => ({
 
     const renderingReview = () => {
         setDoneRenderingReview(true)
-        review = episode.reviews.find((item) => item.user == username )
+        review = episode.reviews
         console.log("REVIEW", review)
-        if (review == undefined)  {  
-            return setValue(0);
-          } else if(review.user == username){
-            return setValue(review.rating);
-          }
-          else{
-              return setValue(0);
-          }
+
+        episode.reviews.find((item) => item.user == username ) == undefined
+        ? setValue(0) :  
+        setValue( episode.reviews.find((item) => item.user == username ).rating)
+
+        console.log("rating", value)
+        setReviewList(review)
         
         }
 
-    console.log("Episode + ", episode);
+    // console.log("Episode + ", episode);
 
-    console.log("Show +", show);
+    // console.log("Show +", show);
     
-    console.log("Related Podcast + ", relatedPodcast);
+    // console.log("Related Podcast + ", relatedPodcast);
 
     const handlePlayButton = e => {
         sessionStorage.setItem("Player", epsid)
@@ -381,10 +380,12 @@ const useStyles = makeStyles(theme => ({
                             </ExpansionPanelSummary>
                             <ExpansionPanelDetails>
                                 <Grid item xs={6}>
-                                    {reviewList.length > 1 &&
+                                    {doneEpisode && reviewList.length >= 1 ?
                                         reviewList.map((item,i) =>
+                                            
                                             <ReviewComp username={item.user} rating={item.rating} content={item.content}/>
                                         )
+                                        : <p></p>
                                     }
                                 </Grid>
                             </ExpansionPanelDetails>
@@ -430,6 +431,13 @@ const useStyles = makeStyles(theme => ({
                                             <Typography variant="subtitle1" gutterBottom>
                                                 {item.author}
                                             </Typography>
+
+                                            <Typography variant="subtitle1" gutterBottom>
+                                            {item.categories.split("|").map((item,i)=>
+                                                <Chip variant="outlined" size="small" label={item} />
+                                            )}
+                                            
+                                        </Typography>
             
                                         </Grid>
                                         </Link>

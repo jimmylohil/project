@@ -28,6 +28,7 @@ import PropTypes from 'prop-types';
 import Login from './LoginComp';
 import {withRouter} from 'react-router-dom';
 import axios from 'axios';
+import { CircularProgress } from '@material-ui/core';
 
 
 
@@ -106,6 +107,10 @@ class CategoryWelcomePage extends Component{
             category : [],
             preferred : [],
             filtered : [],
+            open : false,
+            vertical : 'top',
+            horizontal : 'center',
+            done : undefined,
             username : this.props.location.state.username
         };
         this.onChange = this.onChange.bind(this);
@@ -124,9 +129,11 @@ class CategoryWelcomePage extends Component{
                     {
                         category:response.data.categories,
                         filtered: response.data.categories,
+                        done:true,
                     }
                 )
                 console.log(filtered)
+                
                 
             }
         )
@@ -142,21 +149,25 @@ class CategoryWelcomePage extends Component{
         
         const preferred = this.state.preferred
         let index
-        
-        //check if the check box is checked or unchecked
-        if(e.target.checked){
-            preferred.push(e.target.value)
-        }
-        else{
-            index = preferred.indexOf(e.target.value)
-            preferred.splice(index,1)
-        }
 
-        this.setState({preferred: preferred})
-       
-        if(this.state.preferred.length > 3){
-            alert("Pick 3 categories")
-        }
+        
+            //check if the check box is checked or unchecked
+            if(e.target.checked){
+                if(this.state.preferred.length != 3){
+                    preferred.push(e.target.value)
+                }
+                else{
+                    alert("Pick 3 categories")
+                    e.target.checked=false
+                }
+            }
+            else{
+                index = preferred.indexOf(e.target.value)
+                console.log(index)
+                preferred.splice(index,1)
+            }
+            this.setState({preferred: preferred})
+        
         
         console.log (this.state.preferred);
     };
@@ -248,6 +259,7 @@ class CategoryWelcomePage extends Component{
         
             return (
                 <Container component="main" spacing={0} justify="center" style={{minHeight: '100vh', width : '80%'}}> 
+                 
             
                     <div className={classes.root}>
                         <Typography component="h1" variant="h2">
@@ -267,8 +279,10 @@ class CategoryWelcomePage extends Component{
                                 <SearchIcon />
                             </IconButton>
                         </Paper>
+
         
                         <Paper className={classes.paperlist}>
+                            <Chip variant="outlined" size="small" label="Choose 3 categories" />
                             {preferred.map(item =>{
                                 return(
                                     <Chip
@@ -279,6 +293,11 @@ class CategoryWelcomePage extends Component{
                             })}
                             
                         </Paper>
+                        {!this.state.done == true ? 
+                        <div className={classes.circularpaper}>
+                            <CircularProgress className = {classes.circular}/>
+                        </div>
+                        :null}
         
                         <Grid container maxWidth="lg"> 
 

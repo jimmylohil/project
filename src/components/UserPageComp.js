@@ -139,7 +139,7 @@ paperEps :{
 
 export default function UserPageComp() {
   const classes = useStyles();
-  const username = sessionStorage.getItem("username");
+
   const [recently, setRecently] = useState([]);
   const [subscription, setSubscription] = useState([]);
   const [playlist, setPlaylist] = useState([]);
@@ -158,6 +158,7 @@ export default function UserPageComp() {
 
   var jwt = sessionStorage.getItem("JWT");
   var uuid = sessionStorage.getItem("uuid");
+  var username = sessionStorage.getItem("username");
 
   useEffect(()=>{
     
@@ -198,62 +199,7 @@ export default function UserPageComp() {
       })
     } , [jwt,username]);
 
-    const handleSetting = () =>{
-      if (displayPIN == true)  setDisplayPIN(false) 
-      else setDisplayPIN(true)
-
-      axios.post(`http://localhost:80/api/changepwd?token=${jwt}`)
-          .then(
-              (res =>{
-                  if(res.status == 200){
-                      console.log("PIN Sent successful")
-                    }
-            
-                    else if(res.status == 200 ){
-                      console.log("Denied");
-                    }
-              }),
-                  
-          )
-          .catch(function(error)
-          {
-          console.log(error);
-          alert("Network Error, Please try again");
-          });
-    }
-
-    const onChange = (e) =>{
-      e.preventDefault();
-      setValidate(e.target.value);
-      console.log(validate)
-    }
-
-    const handleSubmit = () =>{
-      alert(validate);
-      var payload={
-        "reset_pwd" : validate,
-        "email" : "jlohil1505@gmail.com"
-      }
-        axios.post('http://localhost:80/main/checkResetPwd',payload)
-        .then(
-            function(res){
-                if(res.status == 200 ){
-                    console.log("PIN matched")
-                  }
-          
-                  else if(res.status == 401 ){
-                    console.log("PIN Not Match");
-                  }
-                  else{
-                    console.log("RES", res)
-                  }
-            }
-        )       
-        .catch(function(error) {
-          console.log(error);
-          alert("Network Error, Please try again");
-        });
-    }
+    
 
 
   return (
@@ -287,28 +233,8 @@ export default function UserPageComp() {
                   
                 </Grid>
                 <Grid item xs={12} className={classes.info}>
-                <Button variant="contained" color="primary" onClick={handleSetting}>
-                  Setting
-                </Button>
-                {displayPIN ? 
-                <Paper className={classes.paperEps}>
-                  <Typography  variant="h4">Verify !</Typography> 
-                  <Typography variant="subtitle2">NB: PIN has been sent to your email</Typography>
-                  <form noValidate autoComplete="off">
-                        <TextField 
-                          variant="outlined"
-                          type="validate"
-                          label="PIN"
-                          id="validate"
-                          margin="normal"
-                          required
-                          fullWidth 
-                          onChange = {onChange}
-                          />
-                          <Button variant="contained" color="secondary" style={{margin: "25px"}} onClick={handleSubmit}>Submit</Button> 
-                  </form>
-                </Paper>
-                 : null }
+                {    }
+                
               </Grid>
             </Grid>
           </Grid>
@@ -372,7 +298,7 @@ export default function UserPageComp() {
                             justify="center"
                             alignItems="center">
                                 <Typography variant="body2" className={classes.content}>
-                                {item.title}
+                                    {item.title.length >= 50 ? (item.title.slice(0,45)).concat('...') : item.title}
                                 </Typography>
                         </Grid>
                         </CardContent>
@@ -452,7 +378,7 @@ export default function UserPageComp() {
                                 justify="center"
                                 alignItems="center">
                                     <Typography variant="body2" className={classes.content}>
-                                        {item.title}
+                                        {item.title.length >= 50 ? (item.title.slice(0,45)).concat('...') : item.title}
                                     </Typography>
                             </Grid>
                         </CardContent>

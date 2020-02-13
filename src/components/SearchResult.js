@@ -14,6 +14,7 @@ import axios from 'axios';
 import IconButton from '@material-ui/core/IconButton';
 import Player from './Player';
 import { CircularProgress } from '@material-ui/core';
+import Chip from '@material-ui/core/Chip';
 
 
 const useStyles = theme => ({
@@ -209,7 +210,9 @@ class SearchResult extends Component {
                                             <Typography variant="subtitle1" gutterBottom>
                                                 {item.author}
                                             </Typography>
-                                         
+                                            {item.categories.split("|").map((item,i)=>
+                                                <Chip variant="outlined" size="small" label={item} />
+                                            )}
 
                                         </Grid>
                                         </Link>

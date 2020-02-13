@@ -22,6 +22,8 @@ import {BrowserRouter as Router, Route} from 'react-router-dom';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import Skeleton from '@material-ui/lab/Skeleton';
 
+import Chip from '@material-ui/core/Chip';
+
 const useStyles = makeStyles(theme => ({
     root: {
       flexGrow: 1,
@@ -123,7 +125,6 @@ function ShowPageComp(props) {
     const [doneEpisodeList, setDoneEpisodeList] = useState(undefined);
     const [doneSubs, setDoneSubs] = useState(undefined);
     const [doneSubsRender, setDoneSubsRender] = useState(false);
-
     
     var jwt = sessionStorage.getItem("JWT");
     var username = sessionStorage.getItem("username");
@@ -214,6 +215,83 @@ function ShowPageComp(props) {
         }
     }
 
+    function Duration({className, seconds}){
+        return(
+      
+          <time dateTime= {`P${Math.round(seconds)}S`} className = {className}>
+            {format(seconds)}
+          </time>
+        )
+      };
+
+    function pad(string){
+        return ('0' + string).slice(-2)
+      }
+
+    function format (seconds){
+        const date = new Date(seconds * 1000)
+        const hh = date.getUTCHours()
+        const mm = date.getUTCMinutes()
+        const ss = pad(date.getUTCSeconds())
+        if(hh){
+          return `${hh}:${pad(mm)}:${ss}`
+        }
+        return `${mm}:${ss}`
+      }
+
+      function PublishDate({className, date}){
+        var now = Date.now();
+        var publish = new Date(date);
+        var seconds = now - publish;
+
+        var yy = Math.floor(seconds/(3600000 * 24 * 365))
+        var mm = Math.floor(seconds/(3600000 * 24 * 30))
+        var ww = Math.floor(seconds/(3600000 * 24 * 7))
+        var dd = Math.floor(seconds/(3600000 * 24 ))
+        var hh = Math.floor(seconds/(3600000  ))
+
+        var year = (yy > 1) ? (yy + " years ago") :  
+               (yy === 1) ? (yy + " year ago") :
+               0
+        
+        if (year !== 0) {
+            return year
+        }
+
+        var month = (mm > 1) ? (yy + " months ago") :  
+               (yy === 1) ? (yy + " month ago") :
+               0
+        
+        if (month !== 0) {
+            return month
+        }
+
+        var week = (ww > 1) ? (ww + " weeks ago") :  
+               (ww === 1) ? (ww + " week ago") :
+               0
+        
+        if (week !== 0) {
+            return week
+        }
+
+        var day = (dd > 1) ? (dd + " days ago") :  
+               (dd === 1) ? (dd + " day ago") :
+               0
+        
+        if (day !== 0) {
+            return day
+        }
+
+        var hour = (hh > 1) ? (hh + " hours ago") :  
+               (hh === 1) ? (hh + " hour ago") :
+               0
+        
+        if (hour !== 0) {
+            return hour
+        }
+
+      };
+
     return (
         <div className={classes.root}>
 
@@ -266,6 +344,13 @@ function ShowPageComp(props) {
                             {!doneShow ? <Skeleton width="30%"/> :
                                 <h3 className={classes.podcaster}>{show.author}</h3>}
                             </Grid>
+                            <Grid item xs ={12}>
+                            {!doneShow ? <Skeleton width="30%"/> :
+                            show.categories.split("|").map((item,i)=>
+                                <Chip variant="outlined" size="small" label={item} />
+                            )}
+                            </Grid>
+                            
                             <Grid item xs ={2}>
                             {!doneShow ? <Skeleton width="50%"/> :
                                 <Rating value={totalRating} readOnly /> }  
@@ -361,7 +446,18 @@ function ShowPageComp(props) {
                                     <Typography variant="subtitle1" gutterBottom>
                                         {show.author}
                                     </Typography>
-                                 
+                                    <Grid container xs={12}>
+                                        <Grid item xs={2}>
+                                            <Typography variant="subtitle1" gutterBottom>
+                                                <Duration seconds={item.audio_length} />
+                                            </Typography>
+                                        </Grid>
+                                        <Grid item xs={3}>
+                                            <Typography variant="subtitle1" gutterBottom>
+                                                <PublishDate date={item.pub_date} />
+                                            </Typography>
+                                        </Grid>
+                                    </Grid>
 
                                 </Grid>
                                 </Link>

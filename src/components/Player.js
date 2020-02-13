@@ -26,6 +26,8 @@ import ReactPlayer from 'react-player';
 import axios from 'axios';
 import {withRouter} from 'react-router-dom';
 import EpisodePageComp from './EpisodePageComp';
+import Button from '@material-ui/core/Button';
+import Grid from '@material-ui/core/Grid';
 
 
 function Duration({className, seconds}){
@@ -117,6 +119,9 @@ const useStyles = theme => ({
       color : 'blue',
       
       
+  },
+  close :{
+    width: 5,
   },
   volume : {
       display : 'flex',
@@ -327,6 +332,11 @@ class Player extends Component{
     console.log(volume)
   }
 
+  handleClose = () => {
+    sessionStorage.removeItem("Player")
+    window.location.reload(false)
+  }
+
   ref = player => {
     this.player = player
   }
@@ -437,6 +447,16 @@ class Player extends Component{
                       onChange = {this.handleVolume}
               />
             </div>
+            <Grid
+              container
+              direction="row"
+              justify="flex-end"
+              alignItems="flex-start"
+              className = {classes.close}
+              onClick ={this.handleClose}
+            >
+              <Button>X</Button>
+            </Grid>
   
           </Card>
         

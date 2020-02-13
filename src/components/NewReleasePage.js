@@ -82,6 +82,10 @@ class NewReleasePage extends Component {
             doneNew : undefined,
         }
         this.handlePlayButton = this.handlePlayButton.bind(this);
+        this.Duration = this.Duration.bind(this);
+        this.pad = this.pad.bind(this);
+        this.format = this.format.bind(this);
+        this.PublishDate = this.PublishDate.bind(this);
     }
 
     secondsToHms(d){
@@ -142,7 +146,82 @@ class NewReleasePage extends Component {
     
     }
 
-   
+    Duration({className, seconds}){
+        return(
+      
+          <time dateTime= {`P${Math.round(seconds)}S`} className = {className}>
+            {this.format(seconds)}
+          </time>
+        )
+      };
+
+    pad(string){
+        return ('0' + string).slice(-2)
+      }
+
+    format(seconds){
+        const date = new Date(seconds * 1000)
+        const hh = date.getUTCHours()
+        const mm = date.getUTCMinutes()
+        const ss = this.pad(date.getUTCSeconds())
+        if(hh){
+          return `${hh}:${this.pad(mm)}:${ss}`
+        }
+        return `${mm}:${ss}`
+      }
+
+    PublishDate({className, date}){
+        var now = Date.now();
+        var publish = new Date(date);
+        var seconds = now - publish;
+
+        var yy = Math.floor(seconds/(3600000 * 24 * 365))
+        var mm = Math.floor(seconds/(3600000 * 24 * 30))
+        var ww = Math.floor(seconds/(3600000 * 24 * 7))
+        var dd = Math.floor(seconds/(3600000 * 24 ))
+        var hh = Math.floor(seconds/(3600000  ))
+
+        var year = (yy > 1) ? (yy + " years ago") :  
+               (yy === 1) ? (yy + " year ago") :
+               0
+        
+        if (year !== 0) {
+            return year
+        }
+
+        var month = (mm > 1) ? (yy + " months ago") :  
+               (yy === 1) ? (yy + " month ago") :
+               0
+        
+        if (month !== 0) {
+            return month
+        }
+
+        var week = (ww > 1) ? (ww + " weeks ago") :  
+               (ww === 1) ? (ww + " week ago") :
+               0
+        
+        if (week !== 0) {
+            return week
+        }
+
+        var day = (dd > 1) ? (dd + " days ago") :  
+               (dd === 1) ? (dd + " day ago") :
+               0
+        
+        if (day !== 0) {
+            return day
+        }
+
+        var hour = (hh > 1) ? (hh + " hours ago") :  
+               (hh === 1) ? (hh + " hour ago") :
+               0
+        
+        if (hour !== 0) {
+            return hour
+        }
+
+      };
 
 
 
@@ -219,7 +298,18 @@ class NewReleasePage extends Component {
                                             <Typography variant="subtitle1" gutterBottom>
                                                 {item.podcast.author}
                                             </Typography>
-                                        
+                                            <Grid container xs={12}>
+                                        <Grid item xs={2}>
+                                            <Typography variant="subtitle1" gutterBottom>
+                                                <this.Duration seconds={item.audio_length} />
+                                            </Typography>
+                                        </Grid>
+                                        <Grid item xs={3}>
+                                            <Typography variant="subtitle1" gutterBottom>
+                                                <this.PublishDate date={item.pub_date} />
+                                            </Typography>
+                                        </Grid>
+                                    </Grid>
                                         </Grid>
                                     </Link>
                                     </Grid>

@@ -15,6 +15,7 @@ import ButtonBase from '@material-ui/core/ButtonBase';
 import IconButton from '@material-ui/core/IconButton';
 import PlayCircleOutline from '@material-ui/icons/PlayCircleOutline';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import Chip from '@material-ui/core/Chip';
 
 import LinearProgress from '@material-ui/core/LinearProgress';
 
@@ -262,7 +263,7 @@ class HomePageComp extends Component {
                                         justify="center"
                                         alignItems="center">
                                             <Typography variant="body2" className={classes.content}>
-                                                {item.title}
+                                                {item.title.length >= 50 ? (item.title.slice(0,45)).concat('...') : item.title}
                                             </Typography>
                                     </Grid>
                                 </CardContent>
@@ -343,7 +344,7 @@ class HomePageComp extends Component {
                                 justify="center"
                                 alignItems="center">
                                     <Typography variant="body2" className={classes.content}>
-                                    {item.title}
+                                    {item.title.length >= 50 ? (item.title.slice(0,45)).concat('...') : item.title}
                                     </Typography>
                             </Grid>
                             </CardContent>
@@ -425,7 +426,7 @@ class HomePageComp extends Component {
                                     justify="center"
                                     alignItems="center">
                                         <Typography variant="body2" className={classes.content}>
-                                            {item.title}
+                                            {item.title.length >= 50 ? (item.title.slice(0,45)).concat('...') : item.title}
                                         </Typography>
                                 </Grid>
                             </CardContent>
@@ -520,6 +521,12 @@ class HomePageComp extends Component {
                                         </Typography>
                                         <Typography variant="subtitle1" gutterBottom>
                                             {item.author}
+                                        </Typography>
+                                        <Typography variant="subtitle1" gutterBottom>
+                                            {item.categories.split("|").map((item,i)=>
+                                                <Chip variant="outlined" size="small" label={item} />
+                                            )}
+                                            
                                         </Typography>
                                     </Grid>
                                 </Link>

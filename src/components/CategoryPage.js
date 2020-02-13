@@ -15,6 +15,7 @@ import IconButton from '@material-ui/core/IconButton';
 import Player from './Player';
 import HeaderComp from './HeaderComp';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import Chip from '@material-ui/core/Chip';
 
 const useStyles = theme => ({
   root: {
@@ -203,7 +204,12 @@ class CategoryPage extends Component {
                                       <Typography variant="subtitle1" gutterBottom>
                                           {item.author}
                                       </Typography>
-                                   
+                                      <Typography variant="subtitle1" gutterBottom>
+                                            {item.categories.split("|").map((item,i)=>
+                                                <Chip variant="outlined" size="small" label={item} />
+                                            )}
+                                            
+                                        </Typography>
                                   </Grid>
                                   </Link>
                               </Grid>
